@@ -13,7 +13,7 @@ int main(void)
     scanf("%f %f %f", &a, &b, &alpha);
 
     alpha = alpha/180.0*PI;
-    h = labs(a-b)/2.0*tan(alpha);
+    h = fabs(a-b)/2.0*tan(alpha);
 
     // a == b or alpha > pi/2
     if(h <= 0)
