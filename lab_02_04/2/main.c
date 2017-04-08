@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define EPS 1e-12
+#define EPS 1e-7
 
 typedef struct
 {
