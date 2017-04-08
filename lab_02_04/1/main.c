@@ -12,13 +12,13 @@ typedef struct list
 {
     uint32_t num;
     uint8_t count;
-    struct list* next;
+    struct list *next;
 } list_t;
 
 typedef struct
 {
     uint8_t size;
-    list_t* data;
+    list_t *data;
 } decomposed_t;
 
 decomposed_t decompose(int num);
@@ -27,7 +27,7 @@ int main(void)
 {
     unsigned int num;
     decomposed_t r;
-    list_t* list = NULL;
+    list_t *list = NULL;
 
     printf("Enter number: ");
     if (scanf("%d", &num) != 1)
@@ -55,7 +55,7 @@ int main(void)
 decomposed_t decompose(int num)
 {
     decomposed_t r;
-    list_t* list = NULL;
+    list_t *list = NULL;
 
     r.size = 0;
     r.data = NULL;
