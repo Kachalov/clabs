@@ -13,7 +13,13 @@ int main(void)
     printf("Enter x and eps: ");
     if (scanf("%f%f", &x, &eps) != 2)
     {
-        printf("Input error\n");
+        printf("Error: invalid input\n");
+        return 1;
+    }
+
+    if (fabs(x) >= 1)
+    {
+        printf("Error: |x| < 1\n");
         return 1;
     }
 
