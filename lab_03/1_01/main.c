@@ -40,7 +40,7 @@ int process(FILE *f, float *max1, float *max2)
         return ERR_NO_FILE;
     }
 
-    while (scanf("%f", &x))
+    while (fscanf(f, "%f", &x))
     {
         if (*max1 <= x || i < 2)
         {
