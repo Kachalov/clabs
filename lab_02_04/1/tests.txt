@@ -1,0 +1,6 @@
+IN:190
+OUT:19 5 2
+
+IN:q
+OUT:Input error
+

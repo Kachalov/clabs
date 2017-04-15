@@ -1,0 +1,15 @@
+IN:4 0 0 3
+IN:1 2.249999
+OUT:Does not contain
+
+IN:4 0 0 3
+IN:1 2.25
+OUT:Contains
+
+IN:1 x y z
+OUT:Incorrect input
+
+IN:1 2 3 4
+IN:d 0
+OUT:Incorrect input
+
