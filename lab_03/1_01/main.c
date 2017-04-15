@@ -42,7 +42,7 @@ int process(FILE *f, float *max1, float *max2)
 
     while (scanf("%f", &x))
     {
-        if (*max1 <= x || i == 0)
+        if (*max1 <= x || i < 2)
         {
             *max2 = *max1;
             *max1 = x;
