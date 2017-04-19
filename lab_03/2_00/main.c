@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#define ERR_NO_ELEMENTS 1
+
 float find_average(FILE *fd, unsigned char *err);
 float find_closest(FILE *fd, float average, unsigned char *err);
 
@@ -28,8 +30,16 @@ int main(int argc, char **argv)
     average = find_average(fd, &err);
     if (err)
     {
-        // TODO: Add more inforamation about error.
-        printf("Error: %d\n", err);
+        switch (err)
+        {
+            case ERR_NO_ELEMENTS:
+                printf("Error: no elemets in file.\n");
+                break;
+
+            default:
+                printf("Unknown error: %d\n", err);
+                break;
+        }
         goto close_fd;
     }
     fseek(fd, 0, SEEK_SET);
@@ -37,6 +47,8 @@ int main(int argc, char **argv)
     printf("%f\n", closest);
     close_fd:
     fclose(fd);
+
+    return 0;
 }
 
 float find_average(FILE *fd, unsigned char *err)
