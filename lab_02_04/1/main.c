@@ -1,16 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #ifdef DEBUG
-    #define DPRINT(...) printf("DEBUG: "); printf(__VA_ARGS__); printf("\n");
+    #define DPRINT(...) {printf("DEBUG: "); printf(__VA_ARGS__); printf("\n");}
 #else
     #define DPRINT(...)
 #endif
 
 typedef struct list
 {
-    uint32_t num;
+    uint64_t num;
     uint8_t count;
     struct list *next;
 } list_t;
@@ -21,16 +22,18 @@ typedef struct
     list_t *data;
 } decomposed_t;
 
-decomposed_t decompose(int num);
+decomposed_t decompose(uint64_t num);
 
 int main(void)
 {
-    unsigned int num;
+    uint64_t num;
     decomposed_t r;
     list_t *list = NULL;
 
+    setbuf(stdout, NULL);
+
     printf("Enter number: ");
-    if (scanf("%d", &num) != 1)
+    if (scanf("%" SCNu64, &num) != 1)
     {
         printf("Input error\n");
         return 1;
@@ -45,14 +48,14 @@ int main(void)
             list = list->next;
 
         for (uint8_t j = 0; j < list->count; j++)
-            printf("%d ", list->num);
+            printf("%" PRIu64 " ", list->num);
     }
     printf("\n");
 
     return 0;
 }
 
-decomposed_t decompose(int num)
+decomposed_t decompose(uint64_t num)
 {
     decomposed_t r;
     list_t *list = NULL;
@@ -60,9 +63,9 @@ decomposed_t decompose(int num)
     r.size = 0;
     r.data = NULL;
 
-    for (uint16_t i = 2; i <= num; i++)
+    for (uint64_t i = 2; i <= num; i++)
     {
-        if (num % i)
+	if (num % i)
             continue;
 
         r.size++;
@@ -77,9 +80,9 @@ decomposed_t decompose(int num)
         }
         r.data = list;
 
-        DPRINT("List addr: %p->%p", r.data, list->next);
-
-        while ((num % i == 0) && (num >= 2))
+        DPRINT("List addr: %p->%p %" PRIu64, r.data, list->next, list->num);
+	
+	while ((num % i == 0) && (num >= 2))
         {
             list->count++;
             num /= i;
