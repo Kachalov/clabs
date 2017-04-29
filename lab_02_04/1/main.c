@@ -23,12 +23,12 @@ typedef struct
 } decomposed_t;
 
 decomposed_t decompose(uint64_t num);
+void print_list(decomposed_t r);
 
 int main(void)
 {
     uint64_t num;
     decomposed_t r;
-    list_t *list = NULL;
 
     setbuf(stdout, NULL);
 
@@ -40,6 +40,15 @@ int main(void)
     }
 
     r = decompose(num);
+    print_list(r);
+
+    return 0;
+}
+
+void print_list(decomposed_t r)
+{
+    list_t* list = NULL;
+
     for (uint8_t i = 0; i < r.size; i++)
     {
         if (list == NULL)
@@ -51,8 +60,6 @@ int main(void)
             printf("%" PRIu64 " ", list->num);
     }
     printf("\n");
-
-    return 0;
 }
 
 decomposed_t decompose(uint64_t num)
