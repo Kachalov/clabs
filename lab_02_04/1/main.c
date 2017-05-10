@@ -4,10 +4,13 @@
 #include <inttypes.h>
 
 #ifdef DEBUG
-    #define DPRINT(...) {printf("DEBUG: "); printf(__VA_ARGS__); printf("\n");}
+    #define DPRINT(...) {fprintf(stderr, "DEBUG: "); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n");}
 #else
     #define DPRINT(...)
 #endif
+
+#define ERR_NO 0
+#define ERR_OOM 1
 
 typedef struct list
 {
@@ -16,19 +19,20 @@ typedef struct list
     struct list *next;
 } list_t;
 
-typedef struct
-{
-    uint8_t size;
-    list_t *data;
-} decomposed_t;
+uint8_t create_list(list_t **list);
+uint8_t delete_list(list_t **list);
+uint8_t add_element(list_t **list);
+//uint8_t delete_element(list_t **list, list_t *element);
+void print_list(list_t *list);
 
-decomposed_t decompose(uint64_t num);
-void print_list(decomposed_t r);
+uint8_t decompose(uint64_t num, list_t **list);
+void print_errcode(uint8_t err);
 
 int main(void)
 {
     uint64_t num;
-    decomposed_t r;
+    list_t *list = NULL;
+    uint8_t err = ERR_NO;
 
     setbuf(stdout, NULL);
 
@@ -39,62 +43,124 @@ int main(void)
         return 1;
     }
 
-    r = decompose(num);
-    print_list(r);
+    err = decompose(num, &list);
+    if (err)
+    {
+        print_errcode(err);
+        return 1;
+    }
 
+    print_list(list);
+    delete_list(&list);
     return 0;
 }
 
-void print_list(decomposed_t r)
+uint8_t decompose(uint64_t num, list_t **list_ptr)
 {
-    list_t* list = NULL;
-
-    for (uint8_t i = 0; i < r.size; i++)
-    {
-        if (list == NULL)
-            list = r.data;
-        else
-            list = list->next;
-
-        for (uint8_t j = 0; j < list->count; j++)
-            printf("%" PRIu64 " ", list->num);
-    }
-    printf("\n");
-}
-
-decomposed_t decompose(uint64_t num)
-{
-    decomposed_t r;
+    uint8_t err = ERR_NO;
     list_t *list = NULL;
-
-    r.size = 0;
-    r.data = NULL;
 
     for (uint64_t i = 2; i <= num; i++)
     {
-	if (num % i)
+        if (num % i)
             continue;
 
-        r.size++;
+        err = add_element(&list);
+        if (err)
+            return err;
 
-        list = malloc(sizeof(list_t));
         list->num = i;
-        list->count = 0;
-
-        if (r.data != NULL)
-        {
-            list->next = r.data;
-        }
-        r.data = list;
-
-        DPRINT("List addr: %p->%p %" PRIu64, r.data, list->next, list->num);
-	
-	while ((num % i == 0) && (num >= 2))
+	    while ((num % i == 0) && (num >= 2))
         {
             list->count++;
             num /= i;
         }
+
+        DPRINT("List address: %p->%p [%" PRIu64 "x%" PRIu8 "]",
+               list, list->next, list->num, list->count);
     }
 
-    return r;
+    *list_ptr = list;
+    return ERR_NO;
+}
+
+void print_errcode(uint8_t err)
+{
+    switch (err)
+    {
+        case ERR_NO:
+            break;
+        case ERR_OOM:
+            fprintf(stderr, "#%" PRIu8 " Can't allocate memory\n", err);
+            break;
+        default:
+            fprintf(stderr, "#%" PRIu8 " Unknown error\n", err);
+            break;
+    }
+}
+
+uint8_t create_list(list_t **list)
+{
+    list_t *list_ptr = (list_t *) malloc(sizeof(list_t));
+
+    if (list_ptr == NULL)
+    {
+        return ERR_OOM;
+    }
+
+    list_ptr->num = 0;
+    list_ptr->count = 0;
+    list_ptr->next = NULL;
+    *list = list_ptr;
+
+    return ERR_NO;
+}
+
+uint8_t delete_list(list_t **list)
+{
+    list_t *next = NULL;
+
+    while (*list != NULL)
+    {
+        next = (*list)->next;
+        free(*list);
+        *list = next;
+    }
+
+    return ERR_NO;
+}
+
+uint8_t add_element(list_t **list)
+{
+    list_t *element = NULL;
+    uint8_t err = ERR_NO;
+
+    if (*list == NULL)
+    {
+        err = create_list(list);
+        if (err)
+            return err;
+        return ERR_NO;
+    }
+
+    err = create_list(&element);
+    if (err)
+        return err;
+
+    element->next = *list;
+    *list = element;
+    return ERR_NO;
+}
+
+//uint8_t delete_element(list_t **list, list_t *element);
+
+void print_list(list_t *list)
+{
+    while (list != NULL)
+    {
+        for (uint8_t i = 0; i < list->count; i++)
+            printf("%" PRIu64 " ", list->num);
+        list = list->next;
+    }
+    printf("\n");
 }
