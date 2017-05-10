@@ -11,6 +11,7 @@
 
 #define ERR_NO 0
 #define ERR_OOM 1
+#define ERR_INVALID_INPUT 2
 
 typedef struct list
 {
@@ -22,7 +23,6 @@ typedef struct list
 uint8_t create_list(list_t **list);
 uint8_t delete_list(list_t **list);
 uint8_t add_element(list_t **list);
-//uint8_t delete_element(list_t **list, list_t *element);
 void print_list(list_t *list);
 
 uint8_t decompose(uint64_t num, list_t **list);
@@ -39,7 +39,7 @@ int main(void)
     printf("Enter number: ");
     if (scanf("%" SCNu64, &num) != 1)
     {
-        printf("Input error\n");
+        print_errcode(ERR_INVALID_INPUT);
         return 1;
     }
 
@@ -92,6 +92,9 @@ void print_errcode(uint8_t err)
             break;
         case ERR_OOM:
             fprintf(stderr, "#%" PRIu8 " Can't allocate memory\n", err);
+            break;
+        case ERR_INVALID_INPUT:
+            fprintf(stderr, "#%" PRIu8 " Invalid input\n", err);
             break;
         default:
             fprintf(stderr, "#%" PRIu8 " Unknown error\n", err);
@@ -151,8 +154,6 @@ uint8_t add_element(list_t **list)
     *list = element;
     return ERR_NO;
 }
-
-//uint8_t delete_element(list_t **list, list_t *element);
 
 void print_list(list_t *list)
 {
