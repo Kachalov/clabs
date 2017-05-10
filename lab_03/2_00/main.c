@@ -118,8 +118,9 @@ float find_average(FILE *fd, unsigned char *err)
 float find_closest(FILE *fd, float average, unsigned char *err)
 {
     float tmp;
-    float delta, delta_new;
-    float closest;
+    float delta = 0;
+    float delta_new = 0;
+    float closest = 0;
     unsigned int i = 0;
 
     *err = ERR_NO;
