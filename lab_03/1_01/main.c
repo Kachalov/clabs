@@ -1,7 +1,8 @@
 #include <stdio.h>
 
-#define ERR_NO_FILE -1
-#define ERR_NOT_ENOUGH_ELEMENTS -2
+#define ERR_NO 0
+#define ERR_NO_FILE 1
+#define ERR_NOT_ENOUGH_ELEMENTS 2
 
 int process(FILE *f, float *max1, float *max2);
 
@@ -13,7 +14,7 @@ int main(void)
 
     switch (status)
     {
-        case 0:
+        case ERR_NO:
         printf("%f %f\n", max1, max2);
         break;
     case ERR_NO_FILE:
@@ -32,28 +33,31 @@ int main(void)
 int process(FILE *f, float *max1, float *max2)
 {
     float x;
-    unsigned int i = 0;
-
+    float max_tmp;
 
     if (f == NULL)
     {
         return ERR_NO_FILE;
     }
 
+    if (fscanf(f, "%f%f", max1, max2) != 2)
+        return ERR_NOT_ENOUGH_ELEMENTS;
+
+    if (*max1 < *max2)
+    {
+        max_tmp = *max1;
+        *max1 = *max2;
+        *max2 = max_tmp;
+    }
+
     while (fscanf(f, "%f", &x))
     {
-        if (*max1 <= x || i < 2)
+        if (*max1 <= x)
         {
             *max2 = *max1;
             *max1 = x;
         }
-        i++;
     }
 
-    if (i < 2)
-    {
-        return ERR_NOT_ENOUGH_ELEMENTS;
-    }
-
-    return 0;
+    return ERR_NO;
 }
