@@ -23,6 +23,13 @@ int main(void)
         return 1;
     }
 
+    if (eps <= 0)
+    {
+        printf("Error: eps must be positive\n");
+        return 1;
+    }
+
+
     s_result = s(x, eps);
     f_result = f(x);
 
