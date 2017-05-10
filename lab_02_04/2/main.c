@@ -26,11 +26,11 @@ int main(void)
     }
 
     printf("Enter X(x, y): ");                
-        if (scanf("%f%f", &(x.x), &(x.y)) != 2)
-        {
-                printf("Incorrect input\n");
-                return 1;
-        }
+    if (scanf("%f%f", &(x.x), &(x.y)) != 2)
+    {
+        printf("Incorrect input\n");
+        return 1;
+    }
 
     if (contains(a, b, x))
     {
@@ -52,11 +52,11 @@ bool contains(point2d_t begin, point2d_t end, point2d_t point)
     len_ax = segment_length(begin, point);
     len_bx = segment_length(end, point);
 
-    return (bool)(fabs(-len_ab + len_ax + len_bx) <= EPS);
+    return fabs(-len_ab + len_ax + len_bx) <= EPS;
 }
 
 float segment_length(point2d_t begin, point2d_t end)
 {
-    return sqrt(pow(begin.x - end.x, 2) + pow(begin.y - end.y, 2)); 
+    return sqrt(pow(begin.x - end.x, 2) + pow(begin.y - end.y, 2));
 }
 
