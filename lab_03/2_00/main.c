@@ -1,10 +1,17 @@
 #include <stdio.h>
 #include <math.h>
 
+#define ERR_NO 0
 #define ERR_NO_ELEMENTS 1
+#define ERR_INPUT 2
+#define ERR_SEEK 3
+#define ERR_OPEN 4
+#define ERR_NO_FILENAME 5
+#define ERR_NO_FILE 6
 
 float find_average(FILE *fd, unsigned char *err);
 float find_closest(FILE *fd, float average, unsigned char *err);
+void print_errcode(unsigned char err);
 
 int main(int argc, char **argv)
 {
@@ -15,7 +22,7 @@ int main(int argc, char **argv)
 
     if (argc != 2)
     {
-        printf("Specify filename: %s file.txt\n", argv[0]);
+        print_errcode(ERR_NO_FILENAME);
         return 1;
     }
     filename = argv[1];
@@ -23,41 +30,77 @@ int main(int argc, char **argv)
     fd = fopen(filename, "r");
     if (fd == NULL)
     {
-        printf("File not found\n");
-        return 2;
+        print_errcode(ERR_NO_FILE);
+        return 1;
     }
 
     average = find_average(fd, &err);
     if (err)
     {
-        switch (err)
-        {
-            case ERR_NO_ELEMENTS:
-                printf("Error: no elemets in file.\n");
-                break;
-
-            default:
-                printf("Unknown error: %d\n", err);
-                break;
-        }
-        goto close_fd;
+        print_errcode(err);
+        fclose(fd);
+        return 1;
     }
-    fseek(fd, 0, SEEK_SET);
-    closest = find_closest(fd, average, &err);
-    printf("%f\n", closest);
-    close_fd:
-    fclose(fd);
 
+    if (fseek(fd, 0, SEEK_SET))
+    {
+        print_errcode(ERR_SEEK);
+        fclose(fd);
+        return 1;
+    }
+
+    closest = find_closest(fd, average, &err);
+    if (err)
+    {
+        print_errcode(err);
+        fclose(fd);
+        return 1;
+    }
+
+    printf("%f\n", closest);
+    fclose(fd);
     return 0;
+}
+
+void print_errcode(unsigned char err)
+{
+    switch (err)
+    {
+        case ERR_NO:
+            break;
+        case ERR_NO_ELEMENTS:
+            fprintf(stderr, "Error: No elements in file.\n");
+            break;
+        case ERR_INPUT:
+            fprintf(stderr, "Error: Input error\n");
+            break;
+        case ERR_SEEK:
+            fprintf(stderr, "Error: Could not seek file\n");
+            break;
+        case ERR_OPEN:
+            fprintf(stderr, "Error: Could not open file\n");
+            break;
+        case ERR_NO_FILENAME:
+            fprintf(stderr, "Error: Specify filename\n");
+            break;
+        case ERR_NO_FILE:
+            fprintf(stderr, "Error: File not found\n");
+            break;
+        default:
+            fprintf(stderr, "Unknown error: %d\n", err);
+            break;
+    }
 }
 
 float find_average(FILE *fd, unsigned char *err)
 {
     float tmp;
     float avg = 0;
-    int i = 0;
+    unsigned int i = 0;
 
-    while (fscanf(fd, "%f", &tmp) && !feof(fd))
+    *err = ERR_NO;
+
+    while (fscanf(fd, "%f", &tmp) == 1)
     {
         avg += tmp;
         i++;
@@ -65,7 +108,7 @@ float find_average(FILE *fd, unsigned char *err)
 
     if (!i)
     {
-        *err = 1;
+        *err = ERR_INPUT;
         return 0;
     }
 
@@ -77,12 +120,14 @@ float find_closest(FILE *fd, float average, unsigned char *err)
     float tmp;
     float delta, delta_new;
     float closest;
-    int i = 0;
+    unsigned int i = 0;
 
-    while (fscanf(fd, "%f", &tmp) && !feof(fd))
+    *err = ERR_NO;
+
+    while (fscanf(fd, "%f", &tmp) == 1)
     {
         delta_new = fabs(average - tmp);
-    if (delta_new < delta || !i++)
+        if (delta_new < delta || !i++)
         {
             delta = delta_new;
             closest = tmp;
@@ -91,7 +136,7 @@ float find_closest(FILE *fd, float average, unsigned char *err)
 
     if (!i)
     {
-        *err = 1;
+        *err = ERR_INPUT;
         return 0;
     }
 
