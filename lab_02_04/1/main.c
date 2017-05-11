@@ -20,12 +20,12 @@ typedef struct list
     struct list *next;
 } list_t;
 
-uint8_t create_list(list_t **list);
-uint8_t delete_list(list_t **list);
-uint8_t add_element(list_t **list);
+uint8_t create_list(list_t **list_ptr);
+uint8_t delete_list(list_t **list_ptr);
+uint8_t add_element(list_t **list_ptr);
 void print_list(list_t *list);
 
-uint8_t decompose(uint64_t num, list_t **list);
+uint8_t decompose(uint64_t num, list_t **list_ptr);
 void print_errcode(uint8_t err);
 
 int main(void)
@@ -67,7 +67,10 @@ uint8_t decompose(uint64_t num, list_t **list_ptr)
 
         err = add_element(&list);
         if (err)
+        {
+            delete_list(&list);
             return err;
+        }
 
         list->num = i;
 	    while ((num % i == 0) && (num >= 2))
@@ -102,45 +105,45 @@ void print_errcode(uint8_t err)
     }
 }
 
-uint8_t create_list(list_t **list)
+uint8_t create_list(list_t **list_ptr)
 {
-    list_t *list_ptr = (list_t *) malloc(sizeof(list_t));
+    list_t *list = malloc(sizeof(list_t));
 
-    if (list_ptr == NULL)
+    if (list == NULL)
     {
         return ERR_OOM;
     }
 
-    list_ptr->num = 0;
-    list_ptr->count = 0;
-    list_ptr->next = NULL;
-    *list = list_ptr;
+    list->num = 0;
+    list->count = 0;
+    list->next = NULL;
+    *list_ptr = list;
 
     return ERR_NO;
 }
 
-uint8_t delete_list(list_t **list)
+uint8_t delete_list(list_t **list_ptr)
 {
     list_t *next = NULL;
 
-    while (*list != NULL)
+    while (*list_ptr != NULL)
     {
-        next = (*list)->next;
-        free(*list);
-        *list = next;
+        next = (*list_ptr)->next;
+        free(*list_ptr);
+        *list_ptr = next;
     }
 
     return ERR_NO;
 }
 
-uint8_t add_element(list_t **list)
+uint8_t add_element(list_t **list_ptr)
 {
     list_t *element = NULL;
     uint8_t err = ERR_NO;
 
-    if (*list == NULL)
+    if (*list_ptr == NULL)
     {
-        err = create_list(list);
+        err = create_list(list_ptr);
         if (err)
             return err;
         return ERR_NO;
@@ -150,8 +153,8 @@ uint8_t add_element(list_t **list)
     if (err)
         return err;
 
-    element->next = *list;
-    *list = element;
+    element->next = *list_ptr;
+    *list_ptr = element;
     return ERR_NO;
 }
 
