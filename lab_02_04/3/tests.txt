@@ -1,0 +1,11 @@
+IN:0.179598 0.5
+OUT:1.01613e+000
+OUT:1.01653e+000
+OUT:4.01020e-004
+OUT:3.94499e-004
+
+IN:0.5 a
+OUT:Invalid input
+
+IN:1 0.001
+OUT:Invalid input
