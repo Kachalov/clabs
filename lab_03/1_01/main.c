@@ -57,6 +57,10 @@ int process(FILE *f, float *max1, float *max2)
             *max2 = *max1;
             *max1 = x;
         }
+        else if (*max2 <=x)
+        {
+            *max2 = x;
+        }
     }
 
     return ERR_NO;
