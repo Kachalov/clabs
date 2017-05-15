@@ -36,30 +36,22 @@ int main(int argc, char **argv)
 
     average = find_average(fd, &err);
     if (err)
-    {
-        print_errcode(err);
-        fclose(fd);
-        return 1;
-    }
+        goto shutdown;
 
     if (fseek(fd, 0, SEEK_SET))
-    {
-        print_errcode(ERR_SEEK);
-        fclose(fd);
-        return 1;
-    }
+        goto shutdown;
 
     closest = find_closest(fd, average, &err);
     if (err)
-    {
-        print_errcode(err);
-        fclose(fd);
-        return 1;
-    }
+        goto shutdown;
 
     printf("%f\n", closest);
+    
+    shutdown:
+    if (err)
+        print_errcode(err);
     fclose(fd);
-    return 0;
+    return err ? 1 : 0;
 }
 
 void print_errcode(unsigned char err)

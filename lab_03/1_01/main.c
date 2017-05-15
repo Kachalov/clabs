@@ -50,7 +50,7 @@ int process(FILE *f, float *max1, float *max2)
         *max2 = max_tmp;
     }
 
-    while (fscanf(f, "%f", &x))
+    while (fscanf(f, "%f", &x) == 1)
     {
         if (*max1 <= x)
         {
