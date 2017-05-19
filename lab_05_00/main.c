@@ -11,7 +11,7 @@
 
 
 int read_array(FILE *fd, int *arr, int *arr_size);
-int find_max(const int *arr, int arr_size, int *max);
+int find_max(int const *const arr, int arr_size, int *max);
 void print_error(int err);
 
 int main(int argc, char **argv)
@@ -70,7 +70,7 @@ int read_array(FILE *fd, int *arr, int *arr_size)
     return OK;
 }
 
-int find_max(const int *arr, int arr_size, int *max)
+int find_max(int const *const arr, int arr_size, int *max)
 {
     int max_new = 0;
     int *iter_l = (int *) arr;
