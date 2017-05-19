@@ -35,8 +35,11 @@ int main(int argc, char **argv)
         err = ERR_NO_FILE;
         goto fail;
     }
- 
-    if ((err = read_array(fd, arr, &arr_size)) != OK)
+
+    err = read_array(fd, arr, &arr_size);
+    if (err == ERR_DATA_OVERFLOW)
+        print_error(err);
+    else if (err != OK)
         goto fail;
     
     if ((err = find_max(arr, arr_size, &max)) != OK)
