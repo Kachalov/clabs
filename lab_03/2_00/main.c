@@ -113,24 +113,25 @@ float find_closest(FILE *fd, float average, unsigned char *err)
     float delta = 0;
     float delta_new = 0;
     float closest = 0;
-    unsigned int i = 0;
-
     *err = ERR_NO;
+
+    if (fscanf(fd, "%f", &tmp) != 1)
+    {
+        *err = ERR_INPUT;
+        return 0;
+    }
+
+    delta = fabs(average - tmp);
+    closest = tmp;
 
     while (fscanf(fd, "%f", &tmp) == 1)
     {
         delta_new = fabs(average - tmp);
-        if (delta_new < delta || !i++)
+        if (delta_new < delta)
         {
             delta = delta_new;
             closest = tmp;
         }
-    }
-
-    if (!i)
-    {
-        *err = ERR_INPUT;
-        return 0;
     }
 
     return closest;
