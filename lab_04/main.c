@@ -9,6 +9,7 @@
 #define ERR_INVALID_DATA 1
 #define ERR_ARRAY_SIZE 2
 #define ERR_NO_DATA 3
+#define ERR_ARRAY_INDEX 4
 
 typedef int (*array_function_t)(int *, int);
 typedef int (*array_mutable_function_t)(int *, int *);
@@ -16,6 +17,8 @@ typedef int (*array_mutable_function_t)(int *, int *);
 int read_array(int *arr, int *arr_size);
 void print_array(int *const arr, int arr_size);
 void print_error(int err, int err_function);
+
+int array_insert_element(int *arr, int *arr_size, int element, int pos);
 
 int sum_mul(int *const arr, int arr_size);
 int copy_avg(int *const arr, int arr_size);
@@ -43,9 +46,10 @@ int main(void)
     if((err = read_array(arr, &arr_size)) != OK)
         goto fail;
 
+    err_function = 0;
     for (int i = 0; i < sizeof(funs)/sizeof(array_function_t); i++)
     {
-        err_function = i + 1;
+        err_function++;
         if ((err = (*funs[i])(arr, arr_size)) != OK)
             print_error(err, err_function);
     }
@@ -53,8 +57,7 @@ int main(void)
     for (int i = 0;
          i < sizeof(funs_mutable)/sizeof(array_mutable_function_t); i++)
     {
-        err_function = i + 1;
-
+        err_function++;
         memcpy(arr_tmp, arr, sizeof(arr));
         arr_tmp_size = arr_size;
         if ((err = (*funs_mutable[i])(arr_tmp, &arr_tmp_size)) != OK)
@@ -198,7 +201,29 @@ int del_negative(int *arr, int *arr_size)
 
 int add_sum(int * arr, int *arr_size)
 {
-    return OK;
+    int err = OK;
+
+    int x = 0;
+    int sum = 0;
+
+    printf("Enter x: ");
+    if (scanf("%d", &x) != 1)
+        return ERR_NO_DATA;
+
+    for (int i = 0; i < *arr_size; i++)
+    {
+        sum += arr[i];
+
+        if (arr[i] != x)
+            continue;
+
+        if((err = array_insert_element(
+                arr, arr_size, sum - arr[i], i + 1)) != OK)
+            goto fail;
+    }
+
+    fail:
+    return err;
 }
 
 int swap(int * arr, int arr_size)
@@ -213,5 +238,21 @@ int replace_max(int * arr, int arr_size)
 
 int sort_min_max(int * arr, int arr_size)
 {
+    return OK;
+}
+
+int array_insert_element(int *arr, int *arr_size, int element, int pos)
+{
+    if (*arr_size >= ARRAY_SIZE)
+        return ERR_ARRAY_SIZE;
+
+    if (pos >= *arr_size)
+        return ERR_ARRAY_INDEX;
+
+    for (int i = (*arr_size)++ - 1; i >= pos; i--)
+        arr[i + 1] = arr[i];
+
+    arr[pos] = element;
+
     return OK;
 }
