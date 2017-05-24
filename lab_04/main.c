@@ -40,6 +40,8 @@ char *get_function_name(int err_function, char (*functions_names)[STR_SIZE],
  */
 int array_insert_element(int *arr, int *arr_size, int element, int pos);
 
+int sort_range(int *arr, int begin, int end);
+
 int sum_mul(int *const arr, int arr_size);
 int copy_avg(int *const arr, int arr_size);
 int del_negative(int *arr, int *arr_size);
@@ -154,6 +156,7 @@ void print_array(int *const arr, int arr_size)
 char *get_function_name(int err_function, char (*functions_names)[STR_SIZE],
                         int names_size)
 {
+    // Using `static` to prevent destroying string out of function context.
     static char err_fun_name[STR_SIZE] = "";
 
     if (err_function < 0 || err_function >= names_size)
@@ -244,6 +247,9 @@ int del_negative(int *arr, int *arr_size)
 {
     int offset = 0;
 
+    // In case there is only one element in array. It is a little bit
+    // more complicated algorithm to look on next elements in array, so
+    // I'm looking on previous elements.
     if (*arr_size == 1 && arr[0] < 0)
     {
         (*arr_size)--;
@@ -287,6 +293,7 @@ int add_sum(int *arr, int *arr_size)
                 arr, arr_size, sum - arr[i], i + 1)) != OK)
             goto fail;
 
+        // Skip next element, because it's a sum.
         i++;
     }
 
@@ -344,7 +351,29 @@ int replace_max(int *arr, int arr_size)
 
 int sort_min_max(int *arr, int arr_size)
 {
-    return OK;
+    int err = OK;
+
+    int min_ndx = 0;
+    int max_ndx = 0;
+
+    for (int i = 0; i < arr_size; i++)
+    {
+        if (arr[min_ndx] > arr[i])
+            min_ndx = i;
+
+        if (arr[max_ndx] < arr[i])
+            max_ndx = i;
+    }
+
+    if (arr_size)
+    {
+        if (min_ndx < max_ndx)
+            err = sort_range(arr, min_ndx, max_ndx);
+        else
+            err = sort_range(arr, max_ndx, min_ndx);
+    }
+
+    return err;
 }
 
 int array_insert_element(int *arr, int *arr_size, int element, int pos)
@@ -359,6 +388,27 @@ int array_insert_element(int *arr, int *arr_size, int element, int pos)
         arr[i + 1] = arr[i];
 
     arr[pos] = element;
+
+    return OK;
+}
+
+int sort_range(int *arr, int begin, int end)
+{
+    int tmp = 0;
+
+    // TODO: Implement more optimal algorithm
+    for (int i = begin; i <= end - 1; i++)
+    {
+        for (int j = i; j <= end; j++)
+        {
+            if (arr[i] > arr[j])
+            {
+                tmp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = tmp;
+            }
+        }
+    }
 
     return OK;
 }
