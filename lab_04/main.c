@@ -396,7 +396,6 @@ int sort_range(int *arr, int begin, int end)
 {
     int tmp = 0;
 
-    // TODO: Implement more optimal algorithm
     for (int i = begin; i <= end - 1; i++)
     {
         for (int j = i; j <= end; j++)
