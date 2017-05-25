@@ -1,7 +1,14 @@
+#include <stdio.h>
+#include <assert.h>
 #include "search.h"
+#include "io.h"
 
 int find_max(int const *const arr, int arr_size, int *max)
 {
+    assert(arr_size <= ARRAY_SIZE);
+    assert(arr != NULL);
+    assert(max != NULL);
+
     int max_new = 0;
     int *iter_l = (int *) arr;
     int *iter_r = (int *) arr + arr_size - 1;
