@@ -10,17 +10,16 @@
 #define ERR_NO_FILENAME 5
 
 
-int read_array(FILE *fd, int *arr, int *arr_size);
-int find_max(int const *const arr, int arr_size, int *max);
+int read_array(FILE *fd, int *arr, int **arr_size);
+int find_max(int const *const arr, int *arr_size, int *max);
 void print_error(int err);
 
 int main(int argc, char **argv)
 {
     int arr[ARRAY_SIZE] = {0};
-    int arr_size = 0;
+    int *arr_size = arr;
     int max = 0;
     int err = OK;
-    char *fn = NULL;
     FILE *fd = NULL;
 
     if (argc <= 1)
@@ -29,8 +28,7 @@ int main(int argc, char **argv)
         goto fail;
     }
 
-    fn = argv[1];
-    if ((fd = fopen(fn, "r")) == NULL)
+    if ((fd = fopen(argv[1], "r")) == NULL)
     {
         err = ERR_NO_FILE;
         goto fail;
@@ -41,7 +39,7 @@ int main(int argc, char **argv)
         print_error(err);
     else if (err != OK)
         goto fail;
-    
+
     if ((err = find_max(arr, arr_size, &max)) != OK)
         goto fail;
 
@@ -55,31 +53,29 @@ int main(int argc, char **argv)
     return err == OK ? 0 : 1;
 }
 
-int read_array(FILE *fd, int *arr, int *arr_size)
+int read_array(FILE *fd, int *arr, int **arr_size)
 {
-    int *iter = arr;
     int tmp;
-    *arr_size = 0;
+    int size = 0;
 
     while (fscanf(fd, "%d", &tmp) == 1)
     {
-        if (*arr_size >= ARRAY_SIZE)
+        if (size++ >= ARRAY_SIZE)
         {
             return ERR_DATA_OVERFLOW;
         }
-        *(iter++) = tmp;
-        ++(*arr_size);
+        *((*arr_size)++) = tmp;
     }
     return OK;
 }
 
-int find_max(int const *const arr, int arr_size, int *max)
+int find_max(int const *const arr, int *arr_size, int *max)
 {
     int max_new = 0;
     int *iter_l = (int *) arr;
-    int *iter_r = (int *) arr + arr_size - 1;
+    int *iter_r = (int *) arr_size - 1;
 
-    if (arr_size == 0)
+    if (*iter_l == *iter_r)
         return ERR_NO_DATA; 
 
     *max = *iter_l + *iter_r;
