@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #define ARRAY_MAX 10
 // 2x array size in case 4 (adding elements to array)
@@ -68,7 +69,7 @@ int del_negative(int *arr, int *arr_size);
 int swap(int *arr, int arr_size);
 int replace_max(int *arr, int arr_size);
 int sort_min_max(int *arr, int arr_size);
-int sort_range(int *arr, int begin, int end);
+int sort_range(int *arr, int arr_size);
 
 
 int main(void)
@@ -452,10 +453,8 @@ int sort_min_max(int *arr, int arr_size)
     if (!arr_size)
         return ERR_NOT_ENOUGH_DATA;
 
-    if (min_ndx < max_ndx)
-        err = sort_range(arr, min_ndx, max_ndx);
-    else
-        err = sort_range(arr, max_ndx, min_ndx);
+    err = sort_range(arr + (min_ndx < max_ndx ? min_ndx : max_ndx),
+                     abs(max_ndx - min_ndx) + 1);
 
     return err;
 }
@@ -478,13 +477,15 @@ int array_insert_element(int *arr, int *arr_size, int element, int pos)
     return OK;
 }
 
-int sort_range(int *arr, int begin, int end)
+int sort_range(int *arr, int arr_size)
 {
+    assert(arr_size >= 0);
+
     int tmp = 0;
 
-    for (int i = begin; i <= end - 1; i++)
+    for (int i = 0; i < arr_size - 1; i++)
     {
-        for (int j = i; j <= end; j++)
+        for (int j = i; j < arr_size; j++)
         {
             if (arr[i] > arr[j])
             {
