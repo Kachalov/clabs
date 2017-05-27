@@ -38,15 +38,25 @@ char *get_function_name(int err_function, char (*functions_names)[STR_SIZE],
  * @param arr_size Array size
  * @param element Element to insert
  * @param pos Position
- * @return status
+ * @return Status
  */
 int array_insert_element(int *arr, int *arr_size, int element, int pos);
 
-int sort_range(int *arr, int begin, int end);
-
+/**
+ * @brief Wrapper for running sum_mul function
+ * @param arr Array
+ * @param arr_size Array size
+ * @return Status
+ */
 int sum_mul_wrapper(int *arr, int arr_size);
 int sum_mul(const int *arr, int arr_size, int *sum, int *mul);
 
+/**
+ * @brief Wrapper for running copy_avg function
+ * @param arr Array
+ * @param arr_size Array size
+ * @return Status
+ */
 int copy_avg_wrapper(int *arr, int arr_size);
 int copy_avg(const int *arr, int arr_size,
              int **arr_dest, int *arr_dest_size);
@@ -58,6 +68,8 @@ int del_negative(int *arr, int *arr_size);
 int swap(int *arr, int arr_size);
 int replace_max(int *arr, int arr_size);
 int sort_min_max(int *arr, int arr_size);
+int sort_range(int *arr, int begin, int end);
+
 
 int main(void)
 {
@@ -293,7 +305,7 @@ int copy_avg(const int *arr, int arr_size,
     *arr_dest_size = 0;
 
     if (!arr_size)
-        return ERR_NO_DATA;
+        return ERR_NOT_ENOUGH_DATA;
 
     for (int i = 0; i < arr_size; i++)
         avg += arr[i];
@@ -390,7 +402,7 @@ int swap(int *arr, int arr_size)
     }
 
     if (odd_ndx == -1 || even_ndx == -1)
-        return ERR_NO_DATA;
+        return ERR_NOT_ENOUGH_DATA;
 
     tmp = arr[odd_ndx];
     arr[odd_ndx] = arr[even_ndx];
@@ -414,7 +426,7 @@ int replace_max(int *arr, int arr_size)
     }
 
     if (max_ndx == -1)
-        return ERR_NO_DATA;
+        return ERR_NOT_ENOUGH_DATA;
 
     arr[max_ndx] = sum;
 
@@ -437,13 +449,13 @@ int sort_min_max(int *arr, int arr_size)
             max_ndx = i;
     }
 
-    if (arr_size)
-    {
-        if (min_ndx < max_ndx)
-            err = sort_range(arr, min_ndx, max_ndx);
-        else
-            err = sort_range(arr, max_ndx, min_ndx);
-    }
+    if (!arr_size)
+        return ERR_NOT_ENOUGH_DATA;
+
+    if (min_ndx < max_ndx)
+        err = sort_range(arr, min_ndx, max_ndx);
+    else
+        err = sort_range(arr, max_ndx, min_ndx);
 
     return err;
 }
