@@ -1,4 +1,4 @@
 File 'main.c'
-Lines executed:91.30% of 69
+Lines executed:97.10% of 69
 Creating 'main.c.gcov'
 
