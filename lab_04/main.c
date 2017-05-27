@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #define ARRAY_MAX 10
 // 2x array size in case 4 (adding elements to array)
@@ -10,14 +11,15 @@
 #define OK 0
 #define ERR_INVALID_DATA 1
 #define ERR_ARRAY_SIZE 2
-#define ERR_NO_DATA 3
-#define ERR_ARRAY_INDEX 4
+#define ERR_ARRAY_INDEX 3
+#define ERR_NO_DATA 4
+#define ERR_NOT_ENOUGH_DATA 5
 
 typedef int (*array_function_t)(int *, int);
 typedef int (*array_mutable_function_t)(int *, int *);
 
 int read_array(int *arr, int *arr_size);
-void print_array(int *const arr, int arr_size);
+void print_array(const int *arr, int arr_size);
 void print_error(int err, char *err_fun_name);
 
 /**
@@ -42,10 +44,17 @@ int array_insert_element(int *arr, int *arr_size, int element, int pos);
 
 int sort_range(int *arr, int begin, int end);
 
-int sum_mul(int *const arr, int arr_size);
-int copy_avg(int *const arr, int arr_size);
+int sum_mul_wrapper(int *arr, int arr_size);
+int sum_mul(const int *arr, int arr_size, int *sum, int *mul);
+
+int copy_avg_wrapper(int *arr, int arr_size);
+int copy_avg(const int *arr, int arr_size,
+             int **arr_dest, int *arr_dest_size);
+
+int add_sum_wrapper(int *arr, int *arr_size);
+int add_sum(int *arr, int *arr_size, int x);
+
 int del_negative(int *arr, int *arr_size);
-int add_sum(int *arr, int *arr_size);
 int swap(int *arr, int arr_size);
 int replace_max(int *arr, int arr_size);
 int sort_min_max(int *arr, int arr_size);
@@ -61,12 +70,30 @@ int main(void)
     int err = OK;
     int err_function = -1;
 
-    array_function_t funs[] = {&sum_mul, &copy_avg, &swap, &replace_max,
-                               &sort_min_max};
-    array_mutable_function_t funs_mutable[] = {&del_negative, &add_sum};
-    char funs_names[][STR_SIZE] = {"sum_mul", "copy_avg", "swap",
-                                   "replace_max", "sort_min_max",
-                                   "del_negative", "add_sum"};
+    array_function_t funs[] =
+    {
+        &sum_mul_wrapper,
+        &copy_avg_wrapper,
+        &swap,
+        &replace_max,
+        &sort_min_max,
+    };
+    array_mutable_function_t funs_mutable[] =
+    {
+        &del_negative,
+        &add_sum_wrapper,
+    };
+
+    char funs_names[][STR_SIZE] =
+    {
+        "sum_mul",
+        "copy_avg",
+        "swap",
+        "replace_max",
+        "sort_min_max",
+        "del_negative",
+        "add_sum",
+    };
     int names_size = sizeof(funs_names)/STR_SIZE;
 
     if((err = read_array(arr, &arr_size)) != OK)
@@ -146,7 +173,7 @@ int read_array(int *arr, int *arr_size)
     return OK;
 }
 
-void print_array(int *const arr, int arr_size)
+void print_array(const int *arr, int arr_size)
 {
     for (int i = 0; i < arr_size; i++)
         printf("%d ", arr[i]);
@@ -190,6 +217,10 @@ void print_error(int err, char *err_fun_name)
             memcpy(err_msg, "no data", sizeof(err_msg));
             break;
 
+        case ERR_NOT_ENOUGH_DATA:
+            memcpy(err_msg, "not enough data", sizeof(err_msg));
+            break;
+
         case ERR_ARRAY_INDEX:
             memcpy(err_msg, "invalid array index", sizeof(err_msg));
             break;
@@ -202,29 +233,64 @@ void print_error(int err, char *err_fun_name)
             err_msg, err_fun_name);
 }
 
-int sum_mul(int *const arr, int arr_size)
+int sum_mul_wrapper(int *arr, int arr_size)
 {
+    int err = OK;
     int sum = 0;
-    int mul = 1;
+    int mul = 0;
+
+    if ((err = sum_mul(arr, arr_size, &sum, &mul)) == OK)
+        printf("Sum: %d; Mul: %d;\n", sum, mul);
+
+    return err;
+}
+
+int sum_mul(const int *arr, int arr_size, int *sum, int *mul)
+{
+    int elements_found = 0;
+
+    *sum = 0;
+    *mul = 1;
 
     for (int i = 0; i < arr_size; i++)
     {
         if (arr[i] % 2)
-            mul *= arr[i];
+        {
+            *mul *= arr[i];
+            elements_found |= 2<<0;
+        }
         else
-            sum += arr[i];
+        {
+            *sum += arr[i];
+            elements_found |= 2<<1;
+        }
     }
 
-    printf("Sum: %d; Mul: %d;\n", sum, mul);
-
-    return OK;
+    return elements_found == (2<<2) - 1 ? OK : ERR_NOT_ENOUGH_DATA;
 }
 
-int copy_avg(int *const arr, int arr_size)
+int copy_avg_wrapper(int *arr, int arr_size)
 {
+    int err = OK;
+    int *arr_dest = NULL;
+    int arr_dest_size = 0;
+
+    if ((err = copy_avg(arr, arr_size, &arr_dest, &arr_dest_size)) == OK)
+        print_array(arr_dest, arr_dest_size);
+
+    return err;
+}
+
+int copy_avg(const int *arr, int arr_size,
+             int **arr_new, int *arr_dest_size)
+{
+    assert(arr_new != NULL);
+    assert(arr_dest_size != NULL);
+
     float avg = 0;
     int arr_dest[ARRAY_SIZE] = {0};
-    int arr_dest_size = 0;
+
+    *arr_dest_size = 0;
 
     if (!arr_size)
         return ERR_NO_DATA;
@@ -235,10 +301,9 @@ int copy_avg(int *const arr, int arr_size)
 
     for (int i = 0; i < arr_size; i++)
         if (arr[i] > avg)
-            arr_dest[arr_dest_size++] = arr[i];
+            arr_dest[(*arr_dest_size)++] = arr[i];
 
-    printf("Larger than average (%0.2f): ", avg);
-    print_array(arr_dest, arr_dest_size);
+    *arr_new = arr_dest;
 
     return OK;
 }
@@ -263,7 +328,7 @@ int del_negative(int *arr, int *arr_size)
         if (arr[i - 1 - offset] >= 0)
             continue;
 
-        arr[i - 1 - offset++] = arr[i];
+        arr[i - ++offset] = arr[i];
         arr[i] = 0;
     }
     *arr_size -= offset;
@@ -271,16 +336,24 @@ int del_negative(int *arr, int *arr_size)
     return OK;
 }
 
-int add_sum(int *arr, int *arr_size)
+
+int add_sum_wrapper(int *arr, int *arr_size)
 {
     int err = OK;
-
     int x = 0;
-    int sum = 0;
 
     printf("Enter x: ");
     if (scanf("%d", &x) != 1)
         return ERR_NO_DATA;
+
+    err = add_sum(arr, arr_size, x);
+    return err;
+}
+
+int add_sum(int *arr, int *arr_size, int x)
+{
+    int err = OK;
+    int sum = 0;
 
     for (int i = 0; i < *arr_size; i++)
     {
@@ -291,13 +364,12 @@ int add_sum(int *arr, int *arr_size)
 
         if((err = array_insert_element(
                 arr, arr_size, sum - arr[i], i + 1)) != OK)
-            goto fail;
+            break;
 
         // Skip next element, because it's a sum.
         i++;
     }
 
-    fail:
     return err;
 }
 
@@ -378,6 +450,8 @@ int sort_min_max(int *arr, int arr_size)
 
 int array_insert_element(int *arr, int *arr_size, int element, int pos)
 {
+    assert(pos >= 0);
+
     if (*arr_size >= ARRAY_SIZE)
         return ERR_ARRAY_SIZE;
 
