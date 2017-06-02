@@ -6,10 +6,9 @@
 int main(int argc, char **argv)
 {
     int arr[ARRAY_SIZE] = {0};
-    int arr_size = 0;
+    int *arr_size = arr;
     int max = 0;
     int err = OK;
-    char *fn = NULL;
     FILE *fd = NULL;
 
     if (argc <= 1)
@@ -18,8 +17,7 @@ int main(int argc, char **argv)
         goto fail;
     }
 
-    fn = argv[1];
-    if ((fd = fopen(fn, "r")) == NULL)
+    if ((fd = fopen(argv[1], "r")) == NULL)
     {
         err = ERR_NO_FILE;
         goto fail;

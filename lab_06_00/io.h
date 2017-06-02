@@ -4,5 +4,5 @@
 
 #define ARRAY_SIZE 100
 
-int read_array(FILE *fd, int *arr, int *arr_size);
+int read_array(FILE *fd, int *arr, int **arr_size);
 void print_error(int err);

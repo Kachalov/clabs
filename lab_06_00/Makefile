@@ -21,8 +21,9 @@ test.bin: $(OBJS) test.o
 %.o: %.c *.h
 	$(CC) $(CFLAGS) -c $<
 
-test: test.bin
-	./test.bin
+test: test.bin lab.bin
+	-./test.bin
+	-./test.sh
 
 clean:
 	rm -rf *.o lab.bin test.bin

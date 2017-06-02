@@ -1,20 +1,18 @@
 #include <stdio.h>
 #include "io.h"
 
-int read_array(FILE *fd, int *arr, int *arr_size)
+int read_array(FILE *fd, int *arr, int **arr_size)
 {
-    int *iter = arr;
     int tmp;
-    *arr_size = 0;
+    int size = 0;
 
     while (fscanf(fd, "%d", &tmp) == 1)
     {
-        if (*arr_size >= ARRAY_SIZE)
+        if (size++ >= ARRAY_SIZE)
         {
             return ERR_DATA_OVERFLOW;
         }
-        *(iter++) = tmp;
-        ++(*arr_size);
+        *((*arr_size)++) = tmp;
     }
     return OK;
 }

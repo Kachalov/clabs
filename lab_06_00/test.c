@@ -29,18 +29,18 @@ int main(void)
     for (int i = 0; i < sizeof(tests)/ sizeof(test_find_max_t); i++)
     {
         max = 0;
-        if ((err = find_max(tests[i].arr,
-                            tests[i].size, &max) != tests[i].err))
+        if ((err = find_max(tests[i].arr, tests[i].arr + tests[i].size,
+                            &max) != tests[i].err))
         {
             errs++;
-            printf("E");
+            printf("E[%d/%d]", err, tests[i].err);
             continue;
         }
 
         if (max != tests[i].max)
         {
             errs++;
-            printf("R");
+            printf("R[%d/%d]", max, tests[i].max);
             continue;
         }
 
