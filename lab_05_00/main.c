@@ -75,7 +75,7 @@ int find_max(int const *const arr, int *arr_size, int *max)
     int *iter_l = (int *) arr;
     int *iter_r = (int *) arr_size - 1;
 
-    if (*iter_l == *iter_r)
+    if (iter_l == iter_r + 1)
         return ERR_NO_DATA; 
 
     *max = *iter_l + *iter_r;
