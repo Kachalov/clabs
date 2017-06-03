@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define ARRAY_SIZE 100
+#define ARRAY_SIZE 5
 
 #define OK 0
 #define ERR_INVALID_DATA 1
@@ -13,6 +13,7 @@
 int read_array(FILE *fd, int *arr, int **arr_size);
 int find_max(int const *const arr, int *arr_size, int *max);
 void print_error(int err);
+void print_array(int *begin, int *end);
 
 int main(int argc, char **argv)
 {
@@ -35,6 +36,8 @@ int main(int argc, char **argv)
     }
 
     err = read_array(fd, arr, &arr_size);
+    print_array(arr, arr_size);
+
     if (err == ERR_DATA_OVERFLOW)
         print_error(err);
     else if (err != OK)
@@ -87,6 +90,14 @@ int find_max(int const *const arr, int *arr_size, int *max)
     }
     
     return OK;
+}
+
+void print_array(int *begin, int *end)
+{
+    printf("Array: ");
+    for (int *i = begin; i < end; i++)
+        printf("%d ", *i);
+    printf("\n");
 }
 
 
