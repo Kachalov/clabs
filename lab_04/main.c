@@ -58,9 +58,9 @@ int sum_mul(const int *arr, int arr_size, int *sum, int *mul);
  * @param arr_size Array size
  * @return Status
  */
-int copy_avg_wrapper(int *arr, int arr_size);
+int copy_avg_wrapper(int *arr, int *arr_size);
 int copy_avg(const int *arr, int arr_size,
-             int **arr_dest, int *arr_dest_size);
+             int *arr_dest, int *arr_dest_size);
 
 int add_sum_wrapper(int *arr, int *arr_size);
 int add_sum(int *arr, int *arr_size, int x);
@@ -86,13 +86,13 @@ int main(void)
     array_function_t funs[] =
     {
         &sum_mul_wrapper,
-        &copy_avg_wrapper,
         &swap,
         &replace_max,
         &sort_min_max,
     };
     array_mutable_function_t funs_mutable[] =
     {
+        &copy_avg_wrapper,
         &del_negative,
         &add_sum_wrapper,
     };
@@ -100,10 +100,10 @@ int main(void)
     char funs_names[][STR_SIZE] =
     {
         "sum_mul",
-        "copy_avg",
         "swap",
         "replace_max",
         "sort_min_max",
+        "copy_avg",
         "del_negative",
         "add_sum",
     };
@@ -282,26 +282,27 @@ int sum_mul(const int *arr, int arr_size, int *sum, int *mul)
     return elements_found == (2<<2) - 1 ? OK : ERR_NOT_ENOUGH_DATA;
 }
 
-int copy_avg_wrapper(int *arr, int arr_size)
+int copy_avg_wrapper(int *arr, int *arr_size)
 {
     int err = OK;
-    int *arr_dest = NULL;
+    int arr_dest[ARRAY_SIZE] = {0};
     int arr_dest_size = 0;
 
-    if ((err = copy_avg(arr, arr_size, &arr_dest, &arr_dest_size)) == OK)
-        print_array(arr_dest, arr_dest_size);
+    err = copy_avg(arr, *arr_size, arr_dest, &arr_dest_size);
+
+    memcpy(arr, arr_dest, ARRAY_MAX);
+    *arr_size = arr_dest_size;
 
     return err;
 }
 
 int copy_avg(const int *arr, int arr_size,
-             int **arr_new, int *arr_dest_size)
+             int *arr_new, int *arr_dest_size)
 {
     assert(arr_new != NULL);
     assert(arr_dest_size != NULL);
 
     float avg = 0;
-    int arr_dest[ARRAY_SIZE] = {0};
 
     *arr_dest_size = 0;
 
@@ -314,9 +315,7 @@ int copy_avg(const int *arr, int arr_size,
 
     for (int i = 0; i < arr_size; i++)
         if (arr[i] > avg)
-            arr_dest[(*arr_dest_size)++] = arr[i];
-
-    *arr_new = arr_dest;
+            arr_new[(*arr_dest_size)++] = arr[i];
 
     return OK;
 }
