@@ -1,0 +1,148 @@
+        -:    0:Source:main.c
+        -:    0:Graph:main.gcno
+        -:    0:Data:main.gcda
+        -:    0:Runs:26
+        -:    0:Programs:1
+        -:    1:#include <stdio.h>
+        -:    2:#include <assert.h>
+        -:    3:
+        -:    4:#define ARRAY_SIZE 100
+        -:    5:
+        -:    6:#define OK 0
+        -:    7:#define ERR_NO_FILENAME 1
+        -:    8:#define ERR_NO_FILE 2
+        -:    9:#define ERR_INVALID_DATA 3
+        -:   10:#define ERR_NO_DATA 4
+        -:   11:
+        -:   12:void print_error(int err);
+        -:   13:int read_array(FILE *fd, int *arr, int *arr_size);
+        -:   14:void sort_array(int *arr, int arr_size);
+        -:   15:void print_array(int *const arr, int arr_size);
+        -:   16:void move_element(int *arr, int from, int to);
+        -:   17:
+       26:   18:int main(int argc, char **argv)
+        -:   19:{
+       26:   20:    int err = OK;
+       26:   21:    int arr[ARRAY_SIZE] = {0};
+       26:   22:    int arr_size = 0;
+       26:   23:    FILE *fd = NULL;
+        -:   24:
+       26:   25:    setbuf(stdout, NULL);
+        -:   26:
+       26:   27:    if (argc < 2)
+        -:   28:    {
+        3:   29:        err = ERR_NO_FILENAME;
+        3:   30:        goto fail;
+        -:   31:    }
+        -:   32:
+       23:   33:    fd = fopen(argv[1], "r");
+       23:   34:    if (fd == NULL)
+        -:   35:    {
+        4:   36:        err = ERR_NO_FILE;
+        4:   37:        goto fail;
+        -:   38:    }
+        -:   39:
+       19:   40:    if ((err = read_array(fd, arr, &arr_size)) != OK)
+        7:   41:        goto fail;
+        -:   42:
+       12:   43:    sort_array(arr, arr_size);
+       12:   44:    print_array(arr, arr_size);
+        -:   45:
+        -:   46:    fail:
+       26:   47:    if (err != OK)
+       14:   48:        print_error(err);
+       26:   49:    if (fd != NULL)
+       19:   50:        fclose(fd);
+       26:   51:    return err != OK;
+        -:   52:}
+        -:   53:
+       14:   54:void print_error(int err)
+        -:   55:{
+       14:   56:    assert(err != OK);
+        -:   57:
+       14:   58:    fprintf(stderr, "Error: ");
+       14:   59:    switch (err)
+        -:   60:    {
+        -:   61:        case ERR_INVALID_DATA:
+        6:   62:            fprintf(stderr, "invalid data");
+        6:   63:            break;
+        -:   64:
+        -:   65:        case ERR_NO_DATA:
+        1:   66:            fprintf(stderr, "no data");
+        1:   67:            break;
+        -:   68:
+        -:   69:        case ERR_NO_FILE:
+        4:   70:            fprintf(stderr, "file not found");
+        4:   71:            break;
+        -:   72:
+        -:   73:        case ERR_NO_FILENAME:
+        3:   74:            fprintf(stderr, "no filename specified");
+        3:   75:            break;
+        -:   76:
+        -:   77:        default:
+    #####:   78:            fprintf(stderr, "#%d", err);
+    #####:   79:            break;
+        -:   80:    }
+       14:   81:    fprintf(stderr, "\n");
+       14:   82:}
+        -:   83:
+       19:   84:int read_array(FILE *fd, int *arr, int *arr_size)
+        -:   85:{
+       19:   86:    int err = OK;
+       19:   87:    assert(fd != NULL);
+       19:   88:    assert(arr_size != NULL);
+        -:   89:
+       19:   90:    if (fscanf(fd, "%d", arr_size) != 1)
+        -:   91:    {
+        1:   92:        err = ERR_NO_DATA;
+        1:   93:        goto fail;
+        -:   94:    }
+        -:   95:
+       57:   96:    for (int i = 0; i < *arr_size; i++)
+        -:   97:    {
+       45:   98:        if (fscanf(fd, "%d", &arr[i]) != 1)
+        -:   99:        {
+        6:  100:            err = ERR_INVALID_DATA;
+        6:  101:            goto fail;
+        -:  102:        }
+        -:  103:    }
+        -:  104:
+        -:  105:    fail:
+       19:  106:    if (err != OK)
+        -:  107:    {
+        7:  108:        *arr_size = 0;
+        -:  109:    }
+        -:  110:
+       19:  111:    return err;
+        -:  112:}
+        -:  113:
+       12:  114:void sort_array(int *arr, int arr_size)
+        -:  115:{
+       12:  116:    int pos = 0;
+        -:  117:
+       48:  118:    for (int i = 0; i < arr_size; i++)
+        -:  119:    {
+       36:  120:        if (arr[i] >= 0)
+        -:  121:        {
+       27:  122:            move_element(arr, i, pos++);
+        -:  123:        }
+        -:  124:    }
+       12:  125:}
+        -:  126:
+       12:  127:void print_array(int *const arr, int arr_size)
+        -:  128:{
+       48:  129:    for (int i = 0; i < arr_size; i++)
+       36:  130:        printf("%d ", arr[i]);
+       12:  131:    printf("\n");
+       12:  132:}
+        -:  133:
+       27:  134:void move_element(int *arr, int from, int to)
+        -:  135:{
+       27:  136:    int x = arr[from];
+        -:  137:
+       48:  138:    for (int i = from; i > to; i--)
+        -:  139:    {
+       21:  140:        arr[i] = arr[i-1];
+        -:  141:    }
+       27:  142:    arr[to] = x;
+       27:  143:}

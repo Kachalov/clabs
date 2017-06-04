@@ -1,0 +1,4 @@
+File 'main.c'
+Lines executed:97.10% of 69
+Creating 'main.c.gcov'
+
