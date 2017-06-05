@@ -109,6 +109,8 @@ int main(void)
     };
     int names_size = sizeof(funs_names)/STR_SIZE;
 
+    setbuf(stdout, NULL);
+
     if((err = read_array(arr, &arr_size)) != OK)
         goto fail;
 
