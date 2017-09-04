@@ -6,10 +6,14 @@
 #define FSEEK_ERROR 3
 #define MEM_ALLOC_ERR 4
 
+typedef int (*cmp_f_t)(const void *, const void *);
 
-int get_data_len(FILE *fd, size_t size, int *data_len);
-void sort(void *data, size_t num, size_t size, int (*cmp)(const void *, const void *));
-int filter(void *data, size_t num, size_t size, int (* cmp)(const void *, const void *));
+int get_data_len(FILE *fd, size_t size, size_t *data_len);
+void sort(void *data, size_t num, size_t size, cmp_f_t);
+int filter(void *data, size_t num,
+           size_t size,
+           cmp_f_t,
+           void *data_new, size_t *num_new);
 
 void print_array(const void *data, int num, int size);
 
@@ -34,6 +38,7 @@ int main(int argc, char *argv[])
     size_t data_f_len = 0;
 
 
+
     if (argc < 3)
     {
         err = NO_FILENAME;
@@ -54,27 +59,25 @@ int main(int argc, char *argv[])
         goto exit;
     }
     
-    if ((err = get_data_len(*fin, data_size, *data_len)) != OK)
+    if ((err = get_data_len(fin, data_size, &data_len)) != OK)
         goto exit;
 
-    if ((err = create_array_file(*fin, data_len, data_size, *data)) != OK)
+    if ((err = create_array_file(fin, data_len, data_size, &data)) != OK)
         goto exit;
 
-    if ((err = filter(*data, data_len, data_size, *cmp_int, *data_f, *data_f_len)) != OK)
+    if ((err = filter(&data, data_len, data_size, &cmp_int, &data_f, &data_f_len)) != OK)
         goto exit;
 
-    if ((err = sort(*data, data_len, data_size, *cmp_int)) != OK)
-        goto exit;
-
-    print_array(*data, data_len, data_size);
+    sort(&data, data_len, data_size, &cmp_int);
+    print_array(&data, data_len, data_size);
 
     exit:
 
     if (data != NULL)
-        delete_array(*data);
+        delete_array(&data);
 
     if (data_f != NULL)
-        delete_array(*data_f);
+        delete_array(&data_f);
 
     if (fin != NULL)
         fclose(fin);
