@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define OK 0
 #define NO_FILENAME 1
@@ -16,6 +17,7 @@ int filter(void *data, size_t num,
            size_t size,
            cmp_f_t cmp_f,
            void **data_new, size_t *num_new);
+int swap(void *a, void *b, size_t size);
 
 void print_array(FILE *fd, const void *data, int num, int size);
 
@@ -33,6 +35,9 @@ int main(int argc, char *argv[])
     FILE *fin = NULL;
     FILE *fout = NULL;
 
+    char **cur_arg = argv + 1;
+    bool filtering = false;
+
     void *data = NULL;
     void *data_f = NULL;
     size_t data_size = sizeof(int);
@@ -46,17 +51,23 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
-    fin = fopen(argv[1], "r");
+    if (strcmp(cur_arg[0], "-") == 0)
+    {
+        cur_arg++;
+        filtering = true;
+    }
+
+    fin = fopen(cur_arg[0], "r");
     if (fin == NULL)
     {
         err = NO_FILE;
         goto exit;
     }
 
-    fout = fopen(argv[2], "w");
+    fout = fopen(cur_arg[1], "w");
     if (fout == NULL)
     {
-        err = NO_FILENAME;
+        err = NO_FILE;
         goto exit;
     }
 
@@ -66,10 +77,21 @@ int main(int argc, char *argv[])
     if ((err = create_array_file(fin, data_len, data_size, &data)) != OK)
         goto exit;
 
-    if ((err = filter(data, data_len, data_size, cmp_f, &data_f, &data_f_len)) != OK)
-        goto exit;
+    if (filtering)
+    {
+        if ((err = filter(data, data_len, data_size, cmp_f, &data_f, &data_f_len)) != OK)
+            goto exit;
+    }
+    else
+    {
+        if ((err = create_array(data_len, data_size, &data_f)) != OK)
+            goto exit;
 
-    sort(data, data_len, data_size, cmp_f);
+        memcpy(data_f, data, data_len * data_size);
+        data_f_len = data_len;
+    }
+
+    sort(data_f, data_f_len, data_size, cmp_f);
     print_array(fout, data_f, data_f_len, data_size);
 
     exit:
@@ -111,7 +133,11 @@ int get_data_len(FILE *fd, size_t size, size_t *data_len)
 
 void sort(void *data, size_t num, size_t size, cmp_f_t cmp_f)
 {
-    // TODO: Implement
+    // TODO: Implement 7th algorithm
+    for (int i = 0; i < num - 1; i++)
+        for (int j = i + 1; j < num; j++)
+            if (cmp_f((char *)data + i * size, (char *)data + j * size) > 0)
+                swap((void *)((char *)data + i * size), (void *)((char *)data + j * size), size);
 }
 
 int filter(void *data, size_t num,
@@ -181,8 +207,25 @@ void delete_array(void **data)
     *data = NULL;
 }
 
+int swap(void *a, void *b, size_t size)
+{
+    void *tmp = NULL;
+    int err = OK;
+
+    if ((tmp = malloc(size)) == NULL)
+        goto exit;
+
+    memcpy(tmp, a, size);
+    memcpy(a, b, size);
+    memcpy(b, tmp, size);
+
+    exit:
+    if (tmp != NULL)
+        free(tmp);
+    return err;
+}
+
 int cmp_int(const void *a, const void *b)
 {
-    // TODO: Implement
-    return OK;
+    return *(int *)a - *(int *)b;
 }
