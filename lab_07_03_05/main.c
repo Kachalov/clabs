@@ -3,31 +3,15 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define OK 0
-#define NO_FILENAME 1
-#define NO_FILE 2
-#define FSEEK_ERROR 3
-#define MEM_ALLOC_ERR 4
+#include "filter.h"
+#include "sort.h"
+#include "errors.h"
+#include "array.h"
 
-typedef int (*cmp_f_t)(const void *, const void *);
+// TODO: Use *begin and *end for array edges
 
 int get_data_len(FILE *fd, size_t size, size_t *data_len);
-void sort(void *data, size_t num, size_t size, cmp_f_t cmp_f);
-int filter(void *data, size_t num,
-           size_t size,
-           cmp_f_t cmp_f,
-           void **data_new, size_t *num_new);
-int filter_find_pos(int *begin, int *end);
-int swap(void *a, void *b, size_t size);
 unsigned long long tick(void);
-
-void print_array(FILE *fd, const void *data, int num, int size);
-
-int create_array_file(FILE *fd, size_t num, size_t size, void **data);
-int create_array(size_t num, size_t size, void **data);
-void delete_array(void **data);
-
-int cmp_int(const void *a, const void *b);
 
 
 int main(int argc, char *argv[])
@@ -133,133 +117,9 @@ int get_data_len(FILE *fd, size_t size, size_t *data_len)
     return OK;
 }
 
-void sort(void *data, size_t num, size_t size, cmp_f_t cmp_f)
-{
-    // TODO: Implement 6th algorithm
-
-    if (num == 0)
-        return;
-
-    for (int i = 0; i < num - 1; i++)
-        for (int j = i + 1; j < num; j++)
-            if (cmp_f((char *)data + i * size, (char *)data + j * size) > 0)
-                swap((void *)((char *)data + i * size), (void *)((char *)data + j * size), size);
-}
-
-int filter(void *data, size_t num,
-           size_t size,
-           cmp_f_t cmp_f,
-           void **data_new, size_t *num_new)
-{
-    int err = OK;
-    int p = 0;
-
-    // TODO: Implement
-    p = filter_find_pos((int *)data, (int *)data + num);
-    printf("position: %d\n", p);
-
-    if ((err = create_array(p, size, data_new)) != OK)
-        return err;
-
-    memcpy(*data_new, data, p * size);
-    *num_new = p;
-
-    return OK;
-}
-
-int filter_find_pos(int *begin, int *end)
-{
-    int pos = end - begin;
-    int i = pos;
-
-    for (int *it = end - 1; it >= begin; it--, i--)
-    {
-        printf("%d ", *it);
-        if (*it < 0)
-        {
-            pos = i;
-            break;
-        }
-    }
-
-    return pos;
-}
-
-void print_array(FILE *fd, const void *data, int num, int size)
-{
-    char *it = (char *)data;
-
-    for(int i = 0; i < num; i++)
-    {
-        int *x = (int *)it;
-        printf("%d ", *x);
-        fprintf(fd, "%d ", *it);
-        it += size;
-    }
-}
-
-int create_array_file(FILE *fd, size_t num, size_t size, void **data)
-{
-    int err = OK;
-    void *it = NULL;
-    int tmp = 0;
-
-    fseek(fd, 0, SEEK_SET);
-    if ((err = create_array(num, size, data)) != OK)
-        return err;
-    it = *data;
-
-    while (fscanf(fd, "%d", &tmp) == 1)
-    {
-        memcpy(it, &tmp, size);
-        it = (char *)it + size;
-    }
-
-    fseek(fd, 0, SEEK_SET);
-    return OK;
-}
-
-int create_array(size_t num, size_t size, void **data)
-{
-    *data = malloc(num * size);
-    if (*data == NULL)
-        return MEM_ALLOC_ERR;
-
-    return OK;
-}
-
-void delete_array(void **data)
-{
-    free(*data);
-    *data = NULL;
-}
-
-int swap(void *a, void *b, size_t size)
-{
-    void *tmp = NULL;
-    int err = OK;
-
-    if ((tmp = malloc(size)) == NULL)
-        goto exit;
-
-    memcpy(tmp, a, size);
-    memcpy(a, b, size);
-    memcpy(b, tmp, size);
-
-    exit:
-    if (tmp != NULL)
-        free(tmp);
-    return err;
-}
-
 unsigned long long tick(void)
 {
     unsigned long long t;
     __asm__ __volatile__ ("rdtsc" : "=A" (t));
     return t;
-}
-
-int cmp_int(const void *a, const void *b)
-{
-    return *(int *)a - *(int *)b;
 }
