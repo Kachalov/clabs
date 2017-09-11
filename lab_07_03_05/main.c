@@ -17,7 +17,9 @@ int filter(void *data, size_t num,
            size_t size,
            cmp_f_t cmp_f,
            void **data_new, size_t *num_new);
+int filter_find_pos(int *begin, int *end);
 int swap(void *a, void *b, size_t size);
+unsigned long long tick(void);
 
 void print_array(FILE *fd, const void *data, int num, int size);
 
@@ -133,7 +135,11 @@ int get_data_len(FILE *fd, size_t size, size_t *data_len)
 
 void sort(void *data, size_t num, size_t size, cmp_f_t cmp_f)
 {
-    // TODO: Implement 7th algorithm
+    // TODO: Implement 6th algorithm
+
+    if (num == 0)
+        return;
+
     for (int i = 0; i < num - 1; i++)
         for (int j = i + 1; j < num; j++)
             if (cmp_f((char *)data + i * size, (char *)data + j * size) > 0)
@@ -146,16 +152,37 @@ int filter(void *data, size_t num,
            void **data_new, size_t *num_new)
 {
     int err = OK;
+    int p = 0;
 
     // TODO: Implement
+    p = filter_find_pos((int *)data, (int *)data + num);
+    printf("position: %d\n", p);
 
-    if ((err = create_array(num, size, data_new)) != OK)
+    if ((err = create_array(p, size, data_new)) != OK)
         return err;
 
-    memcpy(*data_new, data, num * size);
-    *num_new = num;
+    memcpy(*data_new, data, p * size);
+    *num_new = p;
 
     return OK;
+}
+
+int filter_find_pos(int *begin, int *end)
+{
+    int pos = end - begin;
+    int i = pos;
+
+    for (int *it = end - 1; it >= begin; it--, i--)
+    {
+        printf("%d ", *it);
+        if (*it < 0)
+        {
+            pos = i;
+            break;
+        }
+    }
+
+    return pos;
 }
 
 void print_array(FILE *fd, const void *data, int num, int size)
@@ -223,6 +250,13 @@ int swap(void *a, void *b, size_t size)
     if (tmp != NULL)
         free(tmp);
     return err;
+}
+
+unsigned long long tick(void)
+{
+    unsigned long long t;
+    __asm__ __volatile__ ("rdtsc" : "=A" (t));
+    return t;
 }
 
 int cmp_int(const void *a, const void *b)
