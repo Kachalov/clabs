@@ -4,17 +4,15 @@
 #include "array.h"
 #include "errors.h"
 
-void print_array(FILE *fd, const void *data, int num, int size)
+void print_int_array(FILE *fd, const void *b, const void *e)
 {
-    char *it = (char *)data;
-
-    for(int i = 0; i < num; i++)
+    for(int *it = (int *)b; it < (int *)e; it++)
     {
-        int *x = (int *)it;
-        printf("%d ", *x);
+        printf("%d ", *it);
         fprintf(fd, "%d ", *it);
-        it += size;
     }
+    printf("\n");
+    fprintf(fd, "\n");
 }
 
 int create_array_file(FILE *fd, size_t num, size_t size, void **data)

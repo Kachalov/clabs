@@ -4,19 +4,16 @@
 #include "array.h"
 #include "errors.h"
 
-int filter(void *data, size_t num,
-           size_t size,
-           cmp_f_t cmp_f,
-           void **data_new, size_t *num_new)
+int filter(void *b, void *e, void **new_b, void **new_e)
 {
     int err = OK;
-    int p = filter_find_pos((int *)data, (int *)data + num);
+    int p = filter_find_pos((int *)b, (int *)e);
 
-    if ((err = create_array(p, size, data_new)) != OK)
+    if ((err = create_array(p, sizeof(int), new_b)) != OK)
         return err;
 
-    memcpy(*data_new, data, p * size);
-    *num_new = p;
+    *new_e = (char *)*new_b + p * sizeof(int);
+    memcpy(*new_b, b, p * sizeof(int));
 
     return OK;
 }

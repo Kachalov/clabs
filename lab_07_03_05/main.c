@@ -24,8 +24,10 @@ int main(int argc, char *argv[])
     char **cur_arg = argv + 1;
     bool filtering = false;
 
-    void *data = NULL;
-    void *data_f = NULL;
+    void *data_b = NULL;
+    void *data_e = NULL;
+    void *data_f_b = NULL;
+    void *data_f_e = NULL;
     size_t data_size = sizeof(int);
     size_t data_len = 0;
     size_t data_f_len = 0;
@@ -60,33 +62,36 @@ int main(int argc, char *argv[])
     if ((err = get_data_len(fin, data_size, &data_len)) != OK)
         goto exit;
 
-    if ((err = create_array_file(fin, data_len, data_size, &data)) != OK)
+    if ((err = create_array_file(fin, data_len, data_size, &data_b)) != OK)
         goto exit;
+
+    data_e = (char *)data_b + data_size * data_len;
 
     if (filtering)
     {
-        if ((err = filter(data, data_len, data_size, cmp_f, &data_f, &data_f_len)) != OK)
+        if ((err = filter(data_b, data_e, &data_f_b, &data_f_e)) != OK)
             goto exit;
     }
     else
     {
-        if ((err = create_array(data_len, data_size, &data_f)) != OK)
+        if ((err = create_array(data_len, data_size, &data_f_b)) != OK)
             goto exit;
 
-        memcpy(data_f, data, data_len * data_size);
+        memcpy(data_f_b, data_b, data_len * data_size);
         data_f_len = data_len;
+        data_f_e = (char *)data_f_b + data_size * data_f_len;
     }
 
-    sort(data_f, data_f_len, data_size, cmp_f);
-    print_array(fout, data_f, data_f_len, data_size);
+    sort(data_f_b, data_f_len, data_size, cmp_f);
+    print_int_array(fout, data_f_b, data_f_e);
 
     exit:
 
-    if (data != NULL)
-        delete_array(&data);
+    if (data_b != NULL)
+        delete_array(&data_b);
 
-    if (data_f != NULL)
-        delete_array(&data_f);
+    if (data_f_b != NULL)
+        delete_array(&data_f_b);
 
     if (fin != NULL)
         fclose(fin);

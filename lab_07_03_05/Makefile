@@ -1,6 +1,6 @@
 CC := gcc
 
-CFLAGS := -Wall -Werror -std=c99 -pedantic
+CFLAGS := -Wall -Werror -std=c99 -pedantic -g -fno-inline -fno-omit-frame-pointer
 
 OBJS := filter.o sort.o array.o swap.o
 
@@ -9,7 +9,7 @@ ifeq ($(mode), debug)
 endif
 
 ifeq ($(mode), release)
-	CFLAGS += -DNDEBUG -g0
+	CFLAGS += -DNDEBUG
 endif
 
 main.exe: $(OBJS) main.o
@@ -25,7 +25,7 @@ test: test.exe main.exe
 	@echo 'Running unit tests...'
 	-@./test.exe
 	@echo -e '\nRunning functional tests...'
-	-@./test.exe
+	-@./test.sh
 
 coverage: $(OBJS) main.o main.exe
 	@echo -e '\nCoverage testing...'
