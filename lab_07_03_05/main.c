@@ -8,11 +8,8 @@
 #include "errors.h"
 #include "array.h"
 
-// TODO: Use *begin and *end for array edges
-
 int get_data_len(FILE *fd, size_t size, size_t *data_len);
 unsigned long long tick(void);
-
 
 int main(int argc, char *argv[])
 {
@@ -130,6 +127,6 @@ int get_data_len(FILE *fd, size_t size, size_t *data_len)
 unsigned long long tick(void)
 {
     unsigned int lo, hi;
-    __asm__ __volatile__ ("rdtsc" : "=A" (lo), "=d" (hi));
+    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
     return ((unsigned long long)hi << 32) | lo;
 }
