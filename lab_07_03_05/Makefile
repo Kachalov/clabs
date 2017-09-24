@@ -2,7 +2,7 @@ CC := gcc
 
 CFLAGS := -Wall -Werror -std=c99 -pedantic -g -fno-inline -fno-omit-frame-pointer
 
-OBJS := filter.o sort.o array.o swap.o
+OBJS := filter.o sort.o array.o swap.o errors.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -fprofile-arcs -ftest-coverage

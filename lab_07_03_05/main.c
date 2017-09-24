@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
     size_t data_f_len = 0;
     cmp_f_t cmp_f = cmp_int;
 
+    unsigned long long tick_b, tick_e;
+
     if (argc < 3)
     {
         err = NO_FILENAME;
@@ -82,8 +84,11 @@ int main(int argc, char *argv[])
         data_f_e = (char *)data_f_b + data_size * data_f_len;
     }
 
+    tick_b = tick();
     sort(data_f_b, data_f_len, data_size, cmp_f);
+    tick_e = tick();
     print_int_array(fout, data_f_b, data_f_e);
+    printf("%llu\n", tick_e - tick_b);
 
     exit:
 
@@ -101,7 +106,7 @@ int main(int argc, char *argv[])
 
     if (err != 0)
     {
-        printf("Error: %d\n", err);
+        printf("Error: %s\n", error_msg(err));
         return 1;
     }
     return 0;

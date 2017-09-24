@@ -8,10 +8,8 @@ void print_int_array(FILE *fd, const void *b, const void *e)
 {
     for(int *it = (int *)b; it < (int *)e; it++)
     {
-        printf("%d ", *it);
         fprintf(fd, "%d ", *it);
     }
-    printf("\n");
     fprintf(fd, "\n");
 }
 
