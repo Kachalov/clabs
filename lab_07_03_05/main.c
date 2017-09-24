@@ -129,7 +129,7 @@ int get_data_len(FILE *fd, size_t size, size_t *data_len)
 
 unsigned long long tick(void)
 {
-    unsigned long long t;
-    __asm__ __volatile__ ("rdtsc" : "=A" (t));
-    return t;
+    unsigned int lo, hi;
+    __asm__ __volatile__ ("rdtsc" : "=A" (lo), "=d" (hi));
+    return ((unsigned long long)hi << 32) | lo;
 }
