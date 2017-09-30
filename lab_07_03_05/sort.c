@@ -3,10 +3,11 @@
 #include "sort.h"
 #include "swap.h"
 
-void sort(void *data, size_t num, size_t size, cmp_f_t cmp_f)
+void sort(void *data_void, size_t num, size_t size, cmp_f_t cmp_f)
 {
     int i = 0;
     int j = num - 1;
+    char *data = (char *)data_void;
 
     if (num == 0)
         return;
@@ -14,19 +15,19 @@ void sort(void *data, size_t num, size_t size, cmp_f_t cmp_f)
     for (; i < j;)
     {
         for (int k = i; k < j; k++)
-            if (cmp_f((char *)data + k * size, (char *)data + (k + 1) * size) > 0)
+            if (cmp_f(data + k * size, data + (k + 1) * size) > 0)
                 swap(
-                        (void *)((char *)data + k * size),
-                        (void *)((char *)data + (k + 1) * size),
+                        (void *)(data + k * size),
+                        (void *)(data + (k + 1) * size),
                         size
                 );
         j--;
 
         for (int k = j; k > i; k--)
-            if (cmp_f((char *)data + (k - 1) * size, (char *)data + k * size) > 0)
+            if (cmp_f(data + (k - 1) * size, data + k * size) > 0)
                 swap(
-                        (void *)((char *)data + k * size),
-                        (void *)((char *)data + (k - 1) * size),
+                        (data + k * size),
+                        (data + (k - 1) * size),
                         size
                 );
         i++;
