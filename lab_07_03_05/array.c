@@ -20,18 +20,17 @@ int create_array_file(FILE *fd, size_t num, size_t size, void **data)
     int tmp = 0;
 
     fseek(fd, 0, SEEK_SET);
-    if ((err = create_array(num, size, data)) != OK)
-        return err;
-    it = *data;
+    if ((err = create_array(num, size, data)) == OK) {
+        it = *data;
 
-    while (fscanf(fd, "%d", &tmp) == 1)
-    {
-        memcpy(it, &tmp, size);
-        it = (char *)it + size;
+        while (fscanf(fd, "%d", &tmp) == 1) {
+            memcpy(it, &tmp, size);
+            it = (char *) it + size;
+        }
+
+        fseek(fd, 0, SEEK_SET);
     }
-
-    fseek(fd, 0, SEEK_SET);
-    return OK;
+    return err;
 }
 
 int create_array(size_t num, size_t size, void **data)
