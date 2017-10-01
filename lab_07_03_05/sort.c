@@ -17,8 +17,8 @@ void sort(void *data_void, size_t num, size_t size, cmp_f_t cmp_f)
         for (int k = i; k < j; k++)
             if (cmp_f(data + k * size, data + (k + 1) * size) > 0)
                 swap(
-                        (void *)(data + k * size),
-                        (void *)(data + (k + 1) * size),
+                        data + k * size,
+                        data + (k + 1) * size,
                         size
                 );
         j--;
@@ -26,8 +26,8 @@ void sort(void *data_void, size_t num, size_t size, cmp_f_t cmp_f)
         for (int k = j; k > i; k--)
             if (cmp_f(data + (k - 1) * size, data + k * size) > 0)
                 swap(
-                        (data + k * size),
-                        (data + (k - 1) * size),
+                        data + k * size,
+                        data + (k - 1) * size,
                         size
                 );
         i++;
