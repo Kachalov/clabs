@@ -15,7 +15,7 @@ endif
 main.exe: $(OBJS) main.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-test.exe: $(OBJS) test.o
+test.exe: $(OBJS) test.o test_filter.o test_sort.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 %.o: %.c *.h
@@ -24,11 +24,11 @@ test.exe: $(OBJS) test.o
 test: test.exe main.exe
 	@echo 'Running unit tests...'
 	-@./test.exe
-	@echo -e '\nRunning functional tests...'
+	@echo 'Running functional tests...'
 	-@./test.sh
 
 coverage: $(OBJS) main.o main.exe
-	@echo -e '\nCoverage testing...'
+	@echo 'Coverage testing...'
 	@gcov $(OBJS) main.o
 
 clean:
