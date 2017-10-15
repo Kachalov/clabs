@@ -19,6 +19,11 @@ int main(int argc, char *argv[])
 {
     int err = EOK;
 
+    mtrxp_t test = NULL;
+    err = read_mtrx("m.txt", &test);
+    printf("Err code: %d\n", err);
+    //print_mtrx(test);
+
     mtrxp_t a = NULL;
     err = alloc_mtrx(10, 20, &a, apply_mtrx_e);
     printf("Err code: %d\n", err);
@@ -29,13 +34,16 @@ int main(int argc, char *argv[])
 
     mtrxp_t c = NULL;
 
-    err = mul_mtrx(a, b, &c);
+    //err = mul_mtrx(a, b, &c);
+    err = slae_mtrx(test, &c);
+    //printf("%d %d\n", c->n, c->m);
     print_mtrx(c);
     printf("Err code: %d\n", err);
 
     free_mtrx(&a);
     free_mtrx(&b);
     free_mtrx(&c);
+    free_mtrx(&test);
 
     return 0;
 }

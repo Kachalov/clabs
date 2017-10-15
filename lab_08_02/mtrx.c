@@ -1,13 +1,18 @@
 #include <inttypes.h>
+#include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "mtrx.h"
 #include "errors.h"
 
 int alloc_mtrx(mtrx_size_t m, mtrx_size_t n, mtrxp_t *mtrx_pp, apply_mtrx_f_t f)
 {
+    assert(*mtrx_pp == NULL);
+    assert(m != 0 || n != 0);
+
     *mtrx_pp = (mtrxp_t)malloc(sizeof(mtrx_t) +
                                m * sizeof(mtrx_data_i_t *) + m * n * sizeof(mtrx_data_i_t));
 
@@ -30,20 +35,25 @@ int alloc_mtrx(mtrx_size_t m, mtrx_size_t n, mtrxp_t *mtrx_pp, apply_mtrx_f_t f)
 
 int free_mtrx(mtrxp_t *mtrx_pp)
 {
-    free(*mtrx_pp);
-    *mtrx_pp = NULL;
+    if (*mtrx_pp != NULL)
+    {
+        free(*mtrx_pp);
+        *mtrx_pp = NULL;
+    }
     return EOK;
 }
 
 void sprint_mtrx(mtrxp_t mtrx_p, char *str)
 {
+    assert(str != NULL);
+
     if (mtrx_p == NULL)
         return;
 
     for (int i = 0; i < mtrx_p->m; i++)
     {
         for (int j = 0; j < mtrx_p->n; j++)
-            sprintf(str + strlen(str), "%d ", mtrx_p->d[i][j]);
+            sprintf(str + strlen(str), "%.3f ", mtrx_p->d[i][j]);
         sprintf(str + strlen(str), "\n");
     }
 }
@@ -57,6 +67,9 @@ void print_mtrx(mtrxp_t mtrx_p)
 
 int sum_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
 {
+    assert(a != NULL);
+    assert(b != NULL);
+
     int err = EOK;
 
     if (a->m != b->m || a->n != b->n)
@@ -79,6 +92,9 @@ int sum_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
 
 int mul_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
 {
+    assert(a != NULL);
+    assert(b != NULL);
+
     int err = EOK;
 
     if (a->n != b->m)
@@ -107,7 +123,129 @@ mtrx_data_i_t mul_i_mtrx(mtrxp_t a, mtrxp_t b, mtrx_size_t i, mtrx_size_t j)
     return r;
 }
 
-int slae_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
+int slae_mtrx(mtrxp_t a, mtrxp_t *c_p)
 {
-    return EOK;
+    assert(a != NULL);
+
+    int err = EOK;
+
+    if (a->n != a->m + 1)
+    {
+        err = EMTRXSIZE;
+    }
+    else
+    {
+        err = alloc_mtrx(1, a->m, c_p, NULL);
+        if (err == EOK)
+        {
+            mtrxp_t b = NULL;
+            err = alloc_mtrx(1, a->m, &b, NULL);
+            if (err == EOK)
+            {
+                // TODO
+            }
+            free_mtrx(&b);
+        }
+    }
+
+    return err;
+}
+
+mtrx_sizes_t size_file_mtrx(FILE *f)
+{
+    mtrx_sizes_t ss;
+    ss.m = 0;
+    ss.n = 0;
+    mtrx_data_i_t tmp = 0;
+    char c;
+    int i = 0;
+    fpos_t pos;
+
+    fgetpos(f, &pos);
+    while (!feof(f))
+    {
+        if ((c = fgetc(f)) == '\n')
+        {
+            ss.m++;
+            i = 0;
+        }
+        else
+        {
+            ungetc(c, f);
+            if (fscanf(f, "%f", &tmp) == 1)
+            {
+                ss.n = ++i > ss.n ? i : ss.n;
+            }
+            else
+            {
+                if (feof(f))
+                    break;
+
+                ss.m = 1;
+                ss.n = 0;
+                break;
+            }
+        }
+    }
+
+    fsetpos(f, &pos);
+    return ss;
+}
+
+int read_mtrx(char *fn, mtrxp_t *m)
+{
+    int err = EOK;
+    FILE *f = fopen(fn, "r");
+    if (f == NULL)
+        err = ENOFILE;
+
+    if (err == EOK)
+    {
+        mtrx_sizes_t ss = size_file_mtrx(f);
+        printf("SIZE: %d %d\n", ss.m, ss.n);
+        if (ss.m == 0 && ss.n == 0)
+        {
+            err = ENODATA;
+        }
+        else if ((ss.m == 1) ^ (ss.n == 1))
+        {
+            err = EFORMAT;
+        }
+        else
+        {
+            err = alloc_mtrx(ss.m, ss.n, m, NULL);
+
+            ss.m = 0;
+            ss.n = 0;
+            char c;
+            mtrx_data_i_t tmp = 0;
+
+            if (err == EOK) {
+                while (!feof(f)) {
+                    if ((c = fgetc(f)) == '\n')
+                    {
+                        ss.m++;
+                        ss.n = 0;
+                    }
+                    else
+                    {
+                        ungetc(c, f);
+                        if (fscanf(f, "%f", &tmp) == 1)
+                        {
+                            (*m)->d[ss.m][ss.n++] = tmp;
+                        }
+                        else
+                        {
+                            if (!feof(f))
+                                err = EFORMAT;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        fclose(f);
+    }
+
+    return err;
 }
