@@ -203,6 +203,7 @@ mtrx_sizes_t size_file_mtrx(FILE *f)
                 if (feof(f))
                     break;
 
+                // EFORMAT case
                 ss.m = 1;
                 ss.n = 0;
                 break;
@@ -241,8 +242,10 @@ int read_mtrx(char *fn, mtrxp_t *m)
             char c;
             mtrx_data_i_t tmp = 0;
 
-            if (err == EOK) {
-                while (!feof(f)) {
+            if (err == EOK)
+            {
+                while (!feof(f))
+                {
                     if ((c = fgetc(f)) == '\n')
                     {
                         ss.m++;
