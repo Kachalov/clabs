@@ -25,6 +25,7 @@ int alloc_mtrx(mtrx_size_t m, mtrx_size_t n, mtrxp_t *mtrx_pp, apply_mtrx_f_t f)
 int free_mtrx(mtrxp_t *mtrx_pp);
 void sprint_mtrx(mtrxp_t mtrx_p, char *str);
 void print_mtrx(mtrxp_t mtrx_p);
+int fprint_mtrx(mtrxp_t mtrx_p, char *fn);
 int sum_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p);
 int mul_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p);
 mtrx_data_i_t mul_i_mtrx(mtrxp_t a, mtrxp_t b, mtrx_size_t i, mtrx_size_t j);

@@ -65,6 +65,28 @@ void print_mtrx(mtrxp_t mtrx_p)
     printf("%s", buf);
 }
 
+int fprint_mtrx(mtrxp_t mtrx_p, char *fn)
+{
+    assert(fn != NULL);
+
+    char buf[4096];
+    int err = EOK;
+    FILE *f = NULL;
+
+    f = fopen(fn, "w");
+    if (f == NULL)
+        err = ENOFILE;
+
+    if (err == EOK)
+    {
+        sprint_mtrx(mtrx_p, buf);
+        fprintf(f, "%s", buf);
+        fclose(f);
+    }
+
+    return err;
+}
+
 int sum_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
 {
     assert(a != NULL);
@@ -202,7 +224,6 @@ int read_mtrx(char *fn, mtrxp_t *m)
     if (err == EOK)
     {
         mtrx_sizes_t ss = size_file_mtrx(f);
-        printf("SIZE: %d %d\n", ss.m, ss.n);
         if (ss.m == 0 && ss.n == 0)
         {
             err = ENODATA;
@@ -237,7 +258,10 @@ int read_mtrx(char *fn, mtrxp_t *m)
                         else
                         {
                             if (!feof(f))
+                            {
+                                free_mtrx(m);
                                 err = EFORMAT;
+                            }
                             break;
                         }
                     }
