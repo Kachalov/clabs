@@ -21,4 +21,5 @@ void sprint_mtrx(mtrxp_t mtrx_p, char *str);
 void print_mtrx(mtrxp_t mtrx_p);
 int sum_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p);
 int mul_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p);
+mtrx_data_i_t mul_i_mtrx(mtrxp_t a, mtrxp_t b, mtrx_size_t i, mtrx_size_t j);
 int slae_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p);

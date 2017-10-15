@@ -37,6 +37,9 @@ int free_mtrx(mtrxp_t *mtrx_pp)
 
 void sprint_mtrx(mtrxp_t mtrx_p, char *str)
 {
+    if (mtrx_p == NULL)
+        return;
+
     for (int i = 0; i < mtrx_p->m; i++)
     {
         for (int j = 0; j < mtrx_p->n; j++)
@@ -62,7 +65,7 @@ int sum_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
     }
     else
     {
-        err = alloc_mtrx(a->m, a->m, c_p, NULL);
+        err = alloc_mtrx(a->m, a->n, c_p, NULL);
         if (err == EOK)
         {
             for (int i = 0; i < a->m; i++)
@@ -78,7 +81,30 @@ int mul_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
 {
     int err = EOK;
 
+    if (a->n != b->m)
+    {
+        err = EMTRXSIZE;
+    }
+    else
+    {
+        err = alloc_mtrx(a->m, b->n, c_p, NULL);
+        if (err == EOK)
+        {
+            for (int i = 0; i < a->m; i++)
+                for (int j = 0; j < b->n; j++)
+                    (*c_p)->d[i][j] = mul_i_mtrx(a, b, i, j);
+        }
+    }
+
     return err;
+}
+
+mtrx_data_i_t mul_i_mtrx(mtrxp_t a, mtrxp_t b, mtrx_size_t i, mtrx_size_t j)
+{
+    mtrx_data_i_t r = 0;
+    for (int k = 0; k < a->n; k++)
+        r += a->d[i][k] * b->d[k][j];
+    return r;
 }
 
 int slae_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
