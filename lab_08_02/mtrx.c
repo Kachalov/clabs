@@ -6,9 +6,11 @@
 #include <assert.h>
 
 #include "mtrx.h"
+#include "mtrx_apply.h"
 #include "errors.h"
 
-int alloc_mtrx(mtrx_size_t m, mtrx_size_t n, mtrxp_t *mtrx_pp, apply_mtrx_f_t f)
+int alloc_mtrx(mtrx_size_t m, mtrx_size_t n, mtrxp_t *mtrx_pp,
+               apply_mtrx_f_t f, void *arg)
 {
     assert(*mtrx_pp == NULL);
     assert(m != 0 || n != 0);
@@ -27,7 +29,7 @@ int alloc_mtrx(mtrx_size_t m, mtrx_size_t n, mtrxp_t *mtrx_pp, apply_mtrx_f_t f)
     {
         (*mtrx_pp)->d[i] = (mtrx_data_i_t *)&(*mtrx_pp)->d[m] + i * n;
         for (int j = 0; j < n; j++)
-            (*mtrx_pp)->d[i][j] = f != NULL ? f(*mtrx_pp, i, j) : 0;
+            (*mtrx_pp)->d[i][j] = f != NULL ? f(*mtrx_pp, i, j, arg) : 0;
     }
 
     return EOK;
@@ -41,6 +43,13 @@ int free_mtrx(mtrxp_t *mtrx_pp)
         *mtrx_pp = NULL;
     }
     return EOK;
+}
+
+void apply_mtrx(mtrxp_t mtrx_p, apply_mtrx_f_t f, void *arg)
+{
+    for (int i = 0; i < mtrx_p->m; i++)
+        for (int j = 0; j < mtrx_p->n; j++)
+            mtrx_p->d[i][j] = f(mtrx_p, i, j, arg);
 }
 
 void sprint_mtrx(mtrxp_t mtrx_p, char *str)
@@ -100,7 +109,7 @@ int sum_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
     }
     else
     {
-        err = alloc_mtrx(a->m, a->n, c_p, NULL);
+        err = alloc_mtrx(a->m, a->n, c_p, NULL, NULL);
         if (err == EOK)
         {
             for (int i = 0; i < a->m; i++)
@@ -125,7 +134,7 @@ int mul_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
     }
     else
     {
-        err = alloc_mtrx(a->m, b->n, c_p, NULL);
+        err = alloc_mtrx(a->m, b->n, c_p, NULL, NULL);
         if (err == EOK)
         {
             for (int i = 0; i < a->m; i++)
@@ -145,28 +154,33 @@ mtrx_data_i_t mul_i_mtrx(mtrxp_t a, mtrxp_t b, mtrx_size_t i, mtrx_size_t j)
     return r;
 }
 
-int slae_mtrx(mtrxp_t a, mtrxp_t *c_p)
+int slae_mtrx(mtrxp_t ac, mtrxp_t *c_p)
 {
-    assert(a != NULL);
+    assert(ac != NULL);
 
     int err = EOK;
 
-    if (a->n != a->m + 1)
+    if (ac->n != ac->m + 1)
     {
         err = EMTRXSIZE;
     }
     else
     {
-        err = alloc_mtrx(1, a->m, c_p, NULL);
+        mtrxp_t a = NULL;
+        err = alloc_mtrx(ac->m, ac->n, &a, apply_mtrx_copy, ac);
         if (err == EOK)
         {
-            mtrxp_t b = NULL;
-            err = alloc_mtrx(1, a->m, &b, NULL);
+            err = alloc_mtrx(1, a->m, c_p, NULL, NULL);
             if (err == EOK)
             {
-                // TODO
+                mtrxp_t b = NULL;
+                err = alloc_mtrx(1, a->m, &b, NULL, NULL);
+                if (err == EOK)
+                {
+                    // TODO
+                }
+                free_mtrx(&b);
             }
-            free_mtrx(&b);
         }
     }
 
@@ -235,7 +249,7 @@ int read_mtrx(char *fn, mtrxp_t *m)
         }
         else
         {
-            err = alloc_mtrx(ss.m, ss.n, m, NULL);
+            err = alloc_mtrx(ss.m, ss.n, m, NULL, NULL);
 
             ss.m = 0;
             ss.n = 0;

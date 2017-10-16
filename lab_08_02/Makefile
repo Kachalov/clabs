@@ -2,7 +2,7 @@ CC := gcc
 
 CFLAGS := -Wall -Werror -std=c99 -g -fno-inline -fno-omit-frame-pointer
 
-OBJS := mtrx.o
+OBJS := mtrx.o mtrx_apply.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -fprofile-arcs -ftest-coverage

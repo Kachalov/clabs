@@ -5,16 +5,6 @@
 #include "mtrx.h"
 #include "errors.h"
 
-mtrx_data_i_t apply_mtrx_numerate(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j)
-{
-    return mtrx_p->n * i + j;
-}
-
-mtrx_data_i_t apply_mtrx_e(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j)
-{
-    return i == j;
-}
-
 // TODO: Error handling
 int main(int argc, char *argv[])
 {
