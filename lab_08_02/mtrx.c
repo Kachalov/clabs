@@ -59,6 +59,7 @@ void sprint_mtrx(mtrxp_t mtrx_p, char *str)
     if (mtrx_p == NULL)
         return;
 
+    sprintf(str, "");
     for (int i = 0; i < mtrx_p->m; i++)
     {
         for (int j = 0; j < mtrx_p->n; j++)
@@ -177,14 +178,92 @@ int slae_mtrx(mtrxp_t ac, mtrxp_t *c_p)
                 err = alloc_mtrx(1, a->m, &b, NULL, NULL);
                 if (err == EOK)
                 {
-                    // TODO
+                    err = gauss_mtrx(a, *c_p);
                 }
                 free_mtrx(&b);
             }
         }
+        free_mtrx(&a);
     }
 
     return err;
+}
+
+int gauss_mtrx(mtrxp_t a, mtrxp_t c)
+{
+    int err = EOK;
+
+    mtrxp_t k = NULL;
+    err = alloc_mtrx(2, a->m, &k, apply_mtrx_ndx, NULL);
+    if (err == EOK)
+    {
+        mtrx_data_i_t *b = k->d[0];
+        mtrx_data_i_t *pos = k->d[1];
+        mtrx_size_t j;
+        mtrx_data_i_t tmp;
+
+        for (int i = 0; i < a->m; i++)
+        {
+            j = max_el_row_mtrx(a, i);
+            printf("max(%d): %.2f\n", j, a->d[i][j]);
+            *(b++) = a->d[i][j];
+
+            swap_col_mtrx(a, i, j);
+            tmp = pos[i];
+            pos[i] = pos[j];
+            pos[j] = tmp;
+
+            normalize_mtrx(a, i);
+            printf("=====\n");
+            print_mtrx(a);
+            printf("=====\n");
+        }
+        
+        free_mtrx(&k);
+    }
+
+    return err;
+}
+
+mtrx_size_t max_el_row_mtrx(mtrxp_t a, mtrx_size_t i)
+{
+    mtrx_size_t max_i = 0;
+    for (mtrx_size_t j = 0; j < a->m; j++)
+        if (fabs(a->d[i][j]) > fabs(a->d[i][max_i]))
+            max_i = j;
+    return max_i;
+}
+
+void swap_col_mtrx(mtrxp_t a, mtrx_size_t i, mtrx_size_t j)
+{
+    mtrx_data_i_t tmp;
+    for (int k = 0; k < a->m; k++)
+    {
+        tmp = a->d[k][i];
+        a->d[k][i] = a->d[k][j];
+        a->d[k][j] = tmp;
+    }
+}
+
+void normalize_mtrx(mtrxp_t a, mtrx_size_t from)
+{
+    mtrx_data_i_t d;
+    for (int i = from; i < a->m; i++)
+    {
+        d = a->d[i][from];
+        for (int j = 0; j < a->n; j++)
+        {
+            if (fabs(d) < 1e-7)
+                continue;
+            a->d[i][j] /= d;
+        }
+    }
+
+    for (int j = 0; j < a->n; j++)
+    {
+        for (int i = from + 1; i < a->m; i++)
+            a->d[i][j] -= a->d[from][j];
+    }
 }
 
 mtrx_sizes_t size_file_mtrx(FILE *f)

@@ -16,3 +16,8 @@ mtrx_data_i_t apply_mtrx_copy(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void
     mtrxp_t mc = (mtrxp_t) arg;
     return mc->d[i][j];
 }
+
+mtrx_data_i_t apply_mtrx_ndx(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void *arg)
+{
+    return j;
+}
