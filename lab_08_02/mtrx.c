@@ -171,7 +171,7 @@ int slae_mtrx(mtrxp_t ac, mtrxp_t *c_p)
         err = alloc_mtrx(ac->m, ac->n, &a, apply_mtrx_copy, ac);
         if (err == EOK)
         {
-            err = alloc_mtrx(1, a->m, c_p, NULL, NULL);
+            err = alloc_mtrx(a->m, 1, c_p, NULL, NULL);
             if (err == EOK)
             {
                 mtrxp_t b = NULL;
@@ -197,8 +197,8 @@ int gauss_mtrx(mtrxp_t a, mtrxp_t c)
     err = alloc_mtrx(2, a->m, &k, apply_mtrx_ndx, NULL);
     if (err == EOK)
     {
-        mtrx_data_i_t *b = k->d[0];
-        mtrx_data_i_t *pos = k->d[1];
+        mtrx_data_i_t *b = k->d[1];
+        mtrx_data_i_t *pos = k->d[0];
         mtrx_size_t j;
         mtrx_data_i_t tmp;
 
@@ -215,10 +215,30 @@ int gauss_mtrx(mtrxp_t a, mtrxp_t c)
 
             normalize_mtrx(a, i);
             printf("=====\n");
+            print_mtrx(k);
+            printf("-----\n");
             print_mtrx(a);
             printf("=====\n");
         }
-        
+        b = k->d[1];
+
+        for (int i = a->m - 1; i >= 0; i--)
+        {
+            tmp = a->d[i][a->n - 1];
+            for (int j = a->n - 2; j > i; j--)
+            {
+                printf("j: %d xi: %.3f bi: %.3f\n", j, a->d[i][j], b[(int)pos[j]]);
+                tmp -= a->d[i][j] * b[(int)pos[j]];
+            }
+            c->d[i][0] = tmp / a->d[i][i];
+        }
+
+        printf("result:\n");
+        print_mtrx(a);
+        printf("solving:\n");
+        print_mtrx(c);
+        printf("bi and pos:\n");
+        print_mtrx(k);
         free_mtrx(&k);
     }
 
