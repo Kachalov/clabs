@@ -43,6 +43,14 @@ int main(int argc, char *argv[])
 
         err = slae_mtrx(a, &c);
 
+        printf("Checking A*X=Y:\n");
+        mtrxp_t r = NULL;
+        a->n--;
+        err = mul_mtrx(a, c, &r);
+        a->n++;
+        print_mtrx(r);
+        free_mtrx(&r);
+
         err = fprint_mtrx(c, argv[2]);
 
         free_mtrx(&a);

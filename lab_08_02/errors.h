@@ -6,3 +6,4 @@
 #define ENOFILE 2
 #define EFORMAT 3
 #define ENODATA 4
+#define ENOSOLVING 5

@@ -179,6 +179,8 @@ int slae_mtrx(mtrxp_t ac, mtrxp_t *c_p)
                 if (err == EOK)
                 {
                     err = gauss_mtrx(a, *c_p);
+                    if (err != EOK)
+                        free_mtrx(c_p);
                 }
                 free_mtrx(&b);
             }
@@ -227,11 +229,17 @@ int gauss_mtrx(mtrxp_t a, mtrxp_t c)
             tmp = a->d[i][a->n - 1];
             for (int j = a->n - 2; j > i; j--)
             {
-                printf("j: %d xi: %.3f bi: %.3f\n", j, a->d[i][j], b[(int)pos[j]]);
-                tmp -= a->d[i][j] * b[(int)pos[j]];
+                printf("i: %d j: %d xi: %.3f bi: %.3f\n",
+                        i, j, a->d[i][j], c->d[(int)pos[j]][0]);
+                tmp -= a->d[i][j] * c->d[(int)pos[j]][0];
             }
-            c->d[i][0] = tmp / a->d[i][i];
+            c->d[(int)pos[i]][0] = tmp / a->d[i][i];
         }
+
+        for (int i = a->m - 1; i >= 0; i--)
+            if (fpclassify(c->d[i][0]) == FP_NAN ||
+                fpclassify(c->d[i][0]) == FP_INFINITE)
+                err = ENOSOLVING;
 
         printf("result:\n");
         print_mtrx(a);
@@ -283,6 +291,9 @@ void normalize_mtrx(mtrxp_t a, mtrx_size_t from)
     {
         for (int i = from + 1; i < a->m; i++)
             a->d[i][j] -= a->d[from][j];
+
+        if (fabs(a->d[from][j]) < 1e-7)
+            a->d[from][j] = 0;
     }
 }
 
