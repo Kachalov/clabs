@@ -82,18 +82,19 @@ int main(int argc, char *argv[])
                     printf("\n");
                 }
                 free_mtrx(&r);
+                err = fprint_mtrx(c, argv[2]);
             }
             else if (err == ENOSOLVING)
             {
-                printf("No solving\n");
+                err = fprint_mtrx(c, argv[2]);
+                printf("No solving!\n");
             }
         }
 
-        err = fprint_mtrx(c, argv[2]);
         free_mtrx(&a);
         free_mtrx(&c);
     }
     printf("Err code: %d\n", err);
 
-    return 0;
+    return err != EOK;
 }

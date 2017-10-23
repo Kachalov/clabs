@@ -63,7 +63,11 @@ void sprint_mtrx(mtrxp_t mtrx_p, char *str)
     for (int i = 0; i < mtrx_p->m; i++)
     {
         for (int j = 0; j < mtrx_p->n; j++)
-            sprintf(str + strlen(str), "%.3f ", mtrx_p->d[i][j]);
+        {
+            sprintf(str + strlen(str), "%.3f", mtrx_p->d[i][j]);
+            if (j != mtrx_p->n - 1)
+                sprintf(str + strlen(str), " ");
+        }
         sprintf(str + strlen(str), "\n");
     }
 }
@@ -339,7 +343,7 @@ int read_mtrx(char *fn, mtrxp_t *m)
         {
             err = ENODATA;
         }
-        else if ((ss.m == 1) ^ (ss.n == 1))
+        else if (ss.m + ss.n == 1)
         {
             err = EFORMAT;
         }
