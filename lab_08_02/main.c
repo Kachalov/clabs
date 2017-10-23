@@ -5,7 +5,6 @@
 #include "mtrx.h"
 #include "errors.h"
 
-// TODO: Error handling
 int main(int argc, char *argv[])
 {
     int err = EOK;
@@ -19,10 +18,9 @@ int main(int argc, char *argv[])
         err = read_mtrx(argv[2], &a);
         if (err == EOK)
         {
+            err = read_mtrx(argv[3], &b);
             if (err == EOK)
             {
-                err = read_mtrx(argv[3], &b);
-
                 if (strcmp(argv[1], "sum") == 0)
                 {
                     err = sum_mtrx(a, b, &c);
