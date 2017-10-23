@@ -56,10 +56,10 @@ void sprint_mtrx(mtrxp_t mtrx_p, char *str)
 {
     assert(str != NULL);
 
+    sprintf(str, "");
     if (mtrx_p == NULL)
         return;
 
-    sprintf(str, "");
     for (int i = 0; i < mtrx_p->m; i++)
     {
         for (int j = 0; j < mtrx_p->n; j++)
@@ -207,7 +207,6 @@ int gauss_mtrx(mtrxp_t a, mtrxp_t c)
         for (int i = 0; i < a->m; i++)
         {
             j = max_el_row_mtrx(a, i);
-            printf("max(%d): %.2f\n", j, a->d[i][j]);
             *(b++) = a->d[i][j];
 
             swap_col_mtrx(a, i, j);
@@ -216,11 +215,6 @@ int gauss_mtrx(mtrxp_t a, mtrxp_t c)
             pos[j] = tmp;
 
             normalize_mtrx(a, i);
-            printf("=====\n");
-            print_mtrx(k);
-            printf("-----\n");
-            print_mtrx(a);
-            printf("=====\n");
         }
         b = k->d[1];
 
@@ -229,8 +223,6 @@ int gauss_mtrx(mtrxp_t a, mtrxp_t c)
             tmp = a->d[i][a->n - 1];
             for (int j = a->n - 2; j > i; j--)
             {
-                printf("i: %d j: %d xi: %.3f bi: %.3f\n",
-                        i, j, a->d[i][j], c->d[(int)pos[j]][0]);
                 tmp -= a->d[i][j] * c->d[(int)pos[j]][0];
             }
             c->d[(int)pos[i]][0] = tmp / a->d[i][i];
@@ -241,12 +233,6 @@ int gauss_mtrx(mtrxp_t a, mtrxp_t c)
                 fpclassify(c->d[i][0]) == FP_INFINITE)
                 err = ENOSOLVING;
 
-        printf("result:\n");
-        print_mtrx(a);
-        printf("solving:\n");
-        print_mtrx(c);
-        printf("bi and pos:\n");
-        print_mtrx(k);
         free_mtrx(&k);
     }
 

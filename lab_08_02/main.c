@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
         err = read_mtrx(argv[2], &a);
         err = read_mtrx(argv[3], &b);
 
-        if (strcmp(argv[1], "sub") == 0)
+        if (strcmp(argv[1], "sum") == 0)
         {
             err = sum_mtrx(a, b, &c);
         }
@@ -28,7 +28,18 @@ int main(int argc, char *argv[])
             err = mul_mtrx(a, b, &c);
         }
 
-        err = fprint_mtrx(c, argv[4]);
+        if (err == EOK)
+        {
+            err = fprint_mtrx(c, argv[4]);
+
+            printf("A mtrx:\n");
+            print_mtrx(a);
+            printf("\nB mtrx:\n");
+            print_mtrx(b);
+            printf("\nResult:\n");
+            print_mtrx(c);
+            printf("\n");
+        }
 
         free_mtrx(&a);
         free_mtrx(&b);
@@ -41,17 +52,36 @@ int main(int argc, char *argv[])
 
         err = read_mtrx(argv[1], &a);
 
+        printf("SLAE mtrx:\n");
+        print_mtrx(a);
+        printf("\n");
+
         err = slae_mtrx(a, &c);
+        if (err == EOK)
+        {
+            mtrxp_t r = NULL;
+            a->n--;
 
-        printf("Checking A*X=Y:\n");
-        mtrxp_t r = NULL;
-        a->n--;
-        err = mul_mtrx(a, c, &r);
-        a->n++;
-        print_mtrx(r);
-        free_mtrx(&r);
+            printf("Result:\n");
+            print_mtrx(c);
+            printf("\n");
 
-        err = fprint_mtrx(c, argv[2]);
+            err = mul_mtrx(a, c, &r);
+            a->n++;
+            if (err == EOK)
+            {
+                printf("Checking A*X=Y:\n");
+                print_mtrx(r);
+                printf("\n");
+            }
+            free_mtrx(&r);
+
+            err = fprint_mtrx(c, argv[2]);
+        }
+        else if (err == ENOSOLVING)
+        {
+            printf("No solving\n");
+        }
 
         free_mtrx(&a);
         free_mtrx(&c);

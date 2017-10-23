@@ -15,15 +15,10 @@ endif
 main.exe: $(OBJS) main.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-test.exe: $(OBJS) test.o test_filter.o test_sort.o
-	$(CC) $(CFLAGS) $^ -o $@
-
 %.o: %.c *.h
 	$(CC) $(CFLAGS) -c $<
 
-test: test.exe main.exe
-	@echo 'Running unit tests...'
-	-@./test.exe
+test: main.exe
 	@echo 'Running functional tests...'
 	-@./test.sh
 
