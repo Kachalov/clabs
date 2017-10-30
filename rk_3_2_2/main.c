@@ -31,9 +31,19 @@ int main(int argc, char **argv)
                                     i++;
                                     x = strtod(cur, &end);
                                     //printf("S '%s'\n", cur);
-                                    if (cur == end)
+                                    if (cur == end || ( !(
+                                                           *end == '\r'
+                                                           || *end == '\n'
+                                                           || *end == ' ')))
                                     {
-                                            //printf("true %c\n", *cur);
+                                            //printf("true %p %p (%c)\n", cur, end, *cur);
+                                            while ('0' <= *cur && *cur <= '9')
+                                            {
+                                                if (!naned)
+                                                    printf("nan ");
+                                                naned = true;
+                                                cur++;
+                                            }
                                             while (!(('0' <= *cur && *cur <= '9')
                                                      || *cur == '.'
                                                      || *cur == '-'
