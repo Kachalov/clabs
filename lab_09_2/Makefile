@@ -5,7 +5,7 @@ CFLAGS := -Wall -Werror -std=c99 -g -fno-inline -fno-omit-frame-pointer
 OBJS := mystr.o
 
 ifeq ($(mode), debug)
-	CFLAGS += -g3 -O0 -fprofile-arcs -ftest-coverage
+	CFLAGS += -g3 -O0 -fprofile-arcs -ftest-coverage -DDEBUG
 endif
 
 ifeq ($(mode), release)

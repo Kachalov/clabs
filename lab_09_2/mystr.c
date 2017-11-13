@@ -20,6 +20,9 @@ ssize_t my_getline(char **lp, size_t *n, FILE *fd)
     int i = 0;
     size_t len = REALLOC_ADD - 1;
 
+    if (feof(fd))
+        *n = EOF;
+
     while (!feof(fd) && len == REALLOC_ADD - 1)
     {
         fgets(buf, REALLOC_ADD, fd);
@@ -40,14 +43,18 @@ ssize_t my_getline(char **lp, size_t *n, FILE *fd)
         }
         else
         {
-            *n = -1;
+            *n = EOF;
             free(*lp);
             break;
         }
     }
 
-    if (feof(fd))
-        *n = -1;
-
     return *n;
+}
+
+char *str_replace(const char *source, const char *search, const char *replace)
+{
+    char *res = (char *)malloc(strlen(source) + 1);
+    strcpy(res, source);
+    return res;
 }
