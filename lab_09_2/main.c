@@ -18,7 +18,7 @@ int process_data(FILE *fin, FILE *fout, char *search, char *replace)
 
         if (n != -1)
         {
-            r = str_replace(l, search, replace);
+            r = my_str_replace(l, search, replace);
             fputs(r, fout);
             fputs("\n", fout);
         }

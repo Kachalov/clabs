@@ -52,7 +52,7 @@ ssize_t my_getline(char **lp, size_t *n, FILE *fd)
     return *n;
 }
 
-char *str_replace(const char *source, const char *search, const char *replace)
+char *my_str_replace(const char *source, const char *search, const char *replace)
 {
     char *res = (char *)malloc(strlen(source) + 1);
     strcpy(res, source);
