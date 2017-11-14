@@ -14,11 +14,12 @@ int process_data(FILE *fin, FILE *fout, char *search, char *replace)
     do
     {
         my_getline(&l, &n, fin);
-        printf("%4zi |%s|\n", n, l);
+        //printf("%4zi |%s|\n", n, l);
 
         if (n != -1)
         {
             r = my_str_replace(l, search, replace);
+            printf("|%s|\n", r);
             fputs(r, fout);
             fputs("\n", fout);
         }
