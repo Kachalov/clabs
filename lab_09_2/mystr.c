@@ -56,15 +56,13 @@ ssize_t my_getline(char **lp, size_t *n, FILE *fd)
 char *my_str_replace(const char *source, const char *search, const char *replace)
 {
     char *res = NULL;
-    int num = -1;
     int num_rep = -1;
-    int bytes_to_copy = 0;
     char *cur = NULL;
     const char *prev_src = source;
+    int num = str_replace_size(source, search);
 
-    for(const char *i = source; i != NULL;
-        i = (i = strstr(i, search)) == NULL ? NULL : i + strlen(search), num++);
-    cur = res = (char *)malloc(strlen(source) + 1 + num * (strlen(replace) - strlen(search)));
+    cur = res = (char *) malloc(
+        strlen(source) + num * (strlen(replace) - strlen(search)) + 1);
 
     for(const char *i = strstr(source, search); num_rep < num;
         i = i == NULL ? NULL : strstr(i, search), num_rep++)
@@ -74,13 +72,7 @@ char *my_str_replace(const char *source, const char *search, const char *replace
         DPRINT("i{%s}", i);
         if (i != NULL)
         {
-            bytes_to_copy = i - prev_src;
-            memcpy(cur, prev_src, bytes_to_copy);
-            cur += bytes_to_copy;
-            i += strlen(search);
-            prev_src = i;
-            strcpy(cur, replace);
-            cur += strlen(replace);
+            str_replace_copy(cur, i, prev_src, search, replace);
         }
         else
         {
@@ -89,4 +81,26 @@ char *my_str_replace(const char *source, const char *search, const char *replace
     }
 
     return res;
+}
+
+int str_replace_size(const char *source, const char *search)
+{
+    int num = -1;
+
+    for(const char *i = source; i != NULL;
+        i = (i = strstr(i, search)) == NULL ? NULL : i + strlen(search), num++);
+
+    return num;
+}
+
+void str_replace_copy(char *cur, const char *src,
+    const char *prev_src, const char *search, const char *replace)
+{
+    int bytes_to_copy = src - prev_src;
+    memcpy(cur, prev_src, bytes_to_copy);
+    cur += bytes_to_copy;
+    src += strlen(search);
+    prev_src = src;
+    strcpy(cur, replace);
+    cur += strlen(replace);
 }

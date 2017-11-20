@@ -4,42 +4,7 @@
 #include "errors.h"
 #include "mystr.h"
 
-int process_data(FILE *fin, FILE *fout, char *search, char *replace)
-{
-    char *l = NULL;
-    char *r = NULL;
-    size_t n = 0;
-    int err = EOK;
-
-    do
-    {
-        my_getline(&l, &n, fin);
-        //printf("%4zi |%s|\n", n, l);
-
-        if (n != -1)
-        {
-            r = my_str_replace(l, search, replace);
-            printf("|%s|\n", r);
-            fputs(r, fout);
-            fputs("\n", fout);
-        }
-
-        if (l != NULL)
-        {
-            free(l);
-            l = NULL;
-        }
-
-        if (r != NULL)
-        {
-            free(r);
-            r = NULL;
-        }
-    }
-    while (n != EOF);
-
-    return err;
-}
+int process_data(FILE *fin, FILE *fout, char *search, char *replace);
 
 int main(int argc, char **argv)
 {
@@ -80,4 +45,40 @@ int main(int argc, char **argv)
         printf("Error code: %d\n", err);
 
     return err != EOK;
+}
+
+int process_data(FILE *fin, FILE *fout, char *search, char *replace)
+{
+    char *l = NULL;
+    char *r = NULL;
+    size_t n = 0;
+    int err = EOK;
+
+    do
+    {
+        my_getline(&l, &n, fin);
+
+        if (n != -1)
+        {
+            r = my_str_replace(l, search, replace);
+            printf("|%s|\n", r);
+            fputs(r, fout);
+            fputs("\n", fout);
+        }
+
+        if (l != NULL)
+        {
+            free(l);
+            l = NULL;
+        }
+
+        if (r != NULL)
+        {
+            free(r);
+            r = NULL;
+        }
+    }
+    while (n != EOF);
+
+    return err;
 }
