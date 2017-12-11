@@ -71,13 +71,9 @@ char *my_str_replace(const char *source, const char *search, const char *replace
         DPRINT("prev_src{%s}", prev_src);
         DPRINT("i{%s}", i);
         if (i != NULL)
-        {
             str_replace_copy(cur, i, prev_src, search, replace);
-        }
         else
-        {
             strcpy(cur, prev_src);
-        }
     }
 
     return res;
