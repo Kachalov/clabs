@@ -78,7 +78,6 @@ int read_students(list1_t **ss)
 
             if (err)
             {
-
                 break;
             }
 

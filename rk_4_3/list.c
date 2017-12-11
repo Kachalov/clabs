@@ -18,3 +18,15 @@ int list_add(list1_t **head, void *data)
 
     return err;
 }
+
+void list_del(list1_t **head)
+{
+    list1_t *tmp = NULL;
+
+    if (*head)
+    {
+        tmp = (*head)->next;
+        free(*head);
+        *head = tmp;
+    }
+}

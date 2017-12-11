@@ -7,3 +7,4 @@ typedef struct _list1_t
 } list1_t;
 
 int list_add(list1_t **head, void *data);
+void list_del(list1_t **head);

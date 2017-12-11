@@ -1,6 +1,6 @@
 CC := gcc
 
-CFLAGS := -Wall -std=c99 -g
+CFLAGS := -Wall -std=c99 -DDEBUG -g
 
 OBJS := list.o student.o
 
