@@ -36,6 +36,9 @@ int my_snprintf(char *s, size_t n, const char *format, ...)
         {
             if (*i == 'c')
                 SAFE_WRITE(bytes, n, s,  va_arg(va, int));
+            else if (*i == 's')
+                for (char *i = va_arg(va, char *); *i; i++)
+                    SAFE_WRITE(bytes, n, s, *i);
 
             fmt = false;
         }
