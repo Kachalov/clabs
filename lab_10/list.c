@@ -5,32 +5,25 @@
 #include "debug.h"
 #include "errors.h"
 
-int list_init(node_t **list_ptr)
+int list_init(node_t **head)
 {
-    node_t *list = malloc(sizeof(node_t));
+    int err = EOK;
+    *head = malloc(sizeof(node_t));
 
-    if (list == NULL)
+    if (!*head)
+        err = EOOM;
+    else
     {
-        return EOOM;
+        (*head)->data = NULL;
+        (*head)->next = NULL;
     }
 
-    list->data = NULL;
-    list->next = NULL;
-    *list_ptr = list;
-
-    return EOK;
+    return err;
 }
 
-void list_free(node_t **list_ptr)
+void list_free(node_t **head)
 {
-    node_t *next = NULL;
-
-    while (*list_ptr != NULL)
-    {
-        next = (*list_ptr)->next;
-        free(*list_ptr);
-        *list_ptr = next;
-    }
+    while (pop_front(head));
 }
 
 void *pop_front(node_t **head)

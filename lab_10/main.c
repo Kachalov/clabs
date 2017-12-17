@@ -37,5 +37,7 @@ int main(void)
         printf("%d ", *(int *)it->data);
     printf("\n");
 
+    list_free(&lst);
+
     return 0;
 }

@@ -1,6 +1,6 @@
 CC := gcc
 
-CFLAGS := -Wall -Werror -std=c99 -g -fno-inline -fno-omit-frame-pointer
+CFLAGS := -Wall -Werror -std=c99 -g -fno-omit-frame-pointer
 
 OBJS := list.o
 
