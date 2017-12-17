@@ -46,6 +46,9 @@ void insert(node_t **head, node_t *elem, node_t *before)
 {
     node_t *cur = *head;
     node_t *prev = NULL;
+
+    elem->next = NULL;
+
     for (; cur && cur != before; prev = cur, cur = cur->next);
 
     if (cur)
@@ -53,11 +56,11 @@ void insert(node_t **head, node_t *elem, node_t *before)
         elem->next = cur->next;
         cur->next = elem;
     }
-    else if (!before && prev)
+    else if (!before && prev) // End of non-empty list
     {
         prev->next = elem;
     }
-    else if (!before)
+    else if (!before) // Empty list
     {
         *head = elem;
     }
@@ -80,13 +83,41 @@ node_t *reverse(node_t *head)
     return ret;
 }
 
-node_t *sort(node_t *head, int (*comparator)(const void *, const void *))
+node_t *sort(node_t *head, int (*cmp)(const void *, const void *))
 {
-    return NULL;
+    node_t *ret = NULL;
+    node_t *itn = NULL;
+
+    for (node_t *it = head; it;)
+    {
+        itn = it->next;
+        sorted_insert(&ret, it, cmp);
+        #ifdef DEBUG
+            DPRINT("list: ");
+            list_print_int(ret);
+        #endif
+        it = itn;
+    }
+
+    return ret;
 }
 
-void sorted_insert(node_t **head, node_t *element,
-                   int (*comparator)(const void *, const void *))
+void sorted_insert(node_t **head, node_t *el,
+                   int (*cmp)(const void *, const void *))
 {
+    node_t *prev = NULL;
 
+    for (node_t *it = *head;
+         it && cmp(it->data, el->data) <= 0;
+         prev = it, it = it->next);
+
+    DPRINT("sorted_insert:prev = %p", (void *)prev);
+
+    if (*head && !prev)
+    {
+        el->next = *head;
+        *head = el;
+    }
+    else
+        insert(head, el, prev);
 }

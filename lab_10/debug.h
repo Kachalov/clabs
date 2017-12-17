@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #ifdef DEBUG
 #define DPRINT(...) do {\
 fprintf(stderr, "DEBUG: "); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n");\

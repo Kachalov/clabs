@@ -1,6 +1,13 @@
 #include <stdio.h>
 
 #include "list.h"
+#include "debug.h"
+
+int cmp_int(const void *a, const void *b)
+{
+    DPRINT("cmp(%d, %d) = %d", *(int *)a, *(int *)b, *(int *)a - *(int *)b);
+    return *(int *)a - *(int *)b;
+}
 
 int main(void)
 {
@@ -31,11 +38,11 @@ int main(void)
     el->data = data + 6;
     insert(&lst, el, tmp);
 
+    list_print_int(lst);
     lst = reverse(lst);
-
-    for_each(it, lst)
-        printf("%d ", *(int *)it->data);
-    printf("\n");
+    list_print_int(lst);
+    lst = sort(lst, cmp_int);
+    list_print_int(lst);
 
     list_free(&lst);
 
