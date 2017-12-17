@@ -20,6 +20,7 @@ main.exe: $(OBJS) main.c
 
 test: main.exe
 	@echo 'Running tests...'
+	./test.sh
 
 clean:
 	rm -rf main.exe *.o *.gcov *.gcda *.gcno

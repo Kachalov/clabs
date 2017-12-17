@@ -2,8 +2,10 @@
 
 #define for_each(it, lst) for (node_t *it = (lst); it; it = it->next)
 #define list_print_int(lst) do {\
-    for_each(it, lst)\
-        printf("%d ", *(int *)it->data);\
+    for_each(it, lst){\
+        printf("%d", *(int *)it->data);\
+        if (it->next) printf(" ");\
+    }\
     printf("\n");\
 } while(0)
 

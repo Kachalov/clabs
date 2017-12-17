@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "list.h"
 #include "debug.h"
@@ -9,38 +10,35 @@ int cmp_int(const void *a, const void *b)
     return *(int *)a - *(int *)b;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
     node_t *lst = NULL;
     node_t *el = NULL;
-    node_t *tmp = NULL;
+    int *tmp = NULL;
 
-    int data[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    for (int argi = 1; argi < argc; argi++)
+    {
+        if ((tmp = malloc(sizeof(int))))
+        {
+            if (sscanf(argv[argi], "%d", tmp) != 1)
+                free(tmp);
+            else
+            {
+                list_init(&el);
+                el->data = tmp;
+                insert(&lst, el, NULL);
+            }
+        }
+    }
 
-    list_init(&el);
-    el->data = data + 0;
-    insert(&lst, el, NULL);
-
-    list_init(&el);
-    el->data = data + 5;
-    insert(&lst, el, NULL);
-
-    list_init(&el);
-    el->data = data + 3;
-    insert(&lst, el, NULL);
-    tmp = el;
-
-    list_init(&el);
-    el->data = data + 9;
-    insert(&lst, el, NULL);
-
-    list_init(&el);
-    el->data = data + 6;
-    insert(&lst, el, tmp);
-
+    printf("original: ");
     list_print_int(lst);
+
+    printf("reversed: ");
     lst = reverse(lst);
     list_print_int(lst);
+
+    printf("sorted: ");
     lst = sort(lst, cmp_int);
     list_print_int(lst);
 
