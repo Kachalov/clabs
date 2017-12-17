@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <wchar.h>
 
 #include "mystring.h"
 
@@ -28,6 +29,7 @@ int main(void)
     TEST_SNPRINTF(err, buf5, 5, "%c--%%c--%c", 'a', 'f');
     TEST_SNPRINTF(err, buf10, 10, "%c--%%c--%c", 'a', 'f');
     TEST_SNPRINTF(err, buf20, 20, "%s/%c", "%abe", '!');
+    TEST_SNPRINTF(err, buf20, 20, "[%ls]", L"lorem");
 
     printf("\nErrors: %u\n", err);
     return err != 0;

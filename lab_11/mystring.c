@@ -24,6 +24,7 @@ int my_snprintf(char *s, size_t n, const char *format, ...)
 {
     va_list va;
     bool fmt = false;
+    bool lmod = false;
     int bytes = 0;
 
     va_start(va, format);
@@ -34,13 +35,30 @@ int my_snprintf(char *s, size_t n, const char *format, ...)
 
         if (fmt && *i != '%')
         {
-            if (*i == 'c')
-                SAFE_WRITE(bytes, n, s,  va_arg(va, int));
-            else if (*i == 's')
-                for (char *i = va_arg(va, char *); *i; i++)
-                    SAFE_WRITE(bytes, n, s, *i);
-
-            fmt = false;
+            switch (*i)
+            {
+                case 'c':
+                    if (lmod)
+                        SAFE_WRITE(bytes, n, s, va_arg(va, wchar_t));
+                    else
+                        SAFE_WRITE(bytes, n, s, va_arg(va, int));
+                    fmt = false;
+                    lmod = false;
+                    break;
+                case 's':
+                    if (lmod)
+                        for (wchar_t *i = va_arg(va, wchar_t *); *i; i++)
+                            SAFE_WRITE(bytes, n, s, *i);
+                    else
+                        for (char *i = va_arg(va, char *); *i; i++)
+                            SAFE_WRITE(bytes, n, s, *i);
+                    fmt = false;
+                    lmod = false;
+                    break;
+                case 'l':
+                    lmod = true;
+                    break;
+            }
         }
         else if (*i == '%')
         {
