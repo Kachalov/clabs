@@ -25,6 +25,9 @@ int my_snprintf(char *s, size_t n, const char *format, ...)
     bool lmod = false;
     int bytes = 0;
 
+    wchar_t *wcarg = NULL;
+    char *carg = NULL;
+
     va_start(va, format);
     for (const char *i = format; *i && bytes >= 0; i++)
     {
@@ -41,12 +44,25 @@ int my_snprintf(char *s, size_t n, const char *format, ...)
                     lmod = false;
                     break;
                 case 's':
+                    wcarg = NULL;
+                    carg = NULL;
+
                     if (lmod)
-                        for (wchar_t *i = va_arg(va, wchar_t *); *i; i++)
-                            SAFE_WRITE(bytes, n, s, *i);
+                        wcarg = va_arg(va, wchar_t *);
                     else
-                        for (char *i = va_arg(va, char *); *i; i++)
+                        carg = va_arg(va, char *);
+
+                    if (lmod && wcarg)
+                        for (wchar_t *i = wcarg; *i; i++)
                             SAFE_WRITE(bytes, n, s, *i);
+                    else if (carg)
+                        for (char *i = carg; *i; i++)
+                            SAFE_WRITE(bytes, n, s, *i);
+
+                    if (!carg && ! wcarg)
+                        for (char *i = "(null)"; *i; i++)
+                            SAFE_WRITE(bytes, n, s, *i);
+
                     fmt = false;
                     lmod = false;
                     break;

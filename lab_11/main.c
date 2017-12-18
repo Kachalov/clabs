@@ -12,7 +12,7 @@
     my = my_snprintf(tmp, n, __VA_ARGS__);\
     std = snprintf(s, n, __VA_ARGS__);\
     if (strcmp(tmp, s) || std != my) {\
-        fprintf(stderr, "E{my=(%d, %s), std=(%d, %s)}", my, tmp, std, s);\
+        fprintf(stderr, "E{my=(%d, '%s'), std=(%d, '%s')}", my, tmp, std, s);\
         err++;\
     } else fprintf(stderr, ".");\
 } while (0)
