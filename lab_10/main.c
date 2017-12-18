@@ -42,6 +42,9 @@ int main(int argc, char **argv)
     lst = sort(lst, cmp_int);
     list_print_int(lst);
 
+    for_each(it, lst)
+        free(it->data);
+
     list_free(&lst);
 
     return 0;
