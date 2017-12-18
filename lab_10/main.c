@@ -24,9 +24,7 @@ int main(int argc, char **argv)
                 free(tmp);
             else
             {
-                list_init(&el);
-                el->data = tmp;
-                insert(&lst, el, NULL);
+                insert_data(&el, tmp);
             }
         }
     }
@@ -45,7 +43,7 @@ int main(int argc, char **argv)
     for_each(it, lst)
         free(it->data);
 
-    list_free(&lst);
+    node_free(&lst);
 
     return 0;
 }

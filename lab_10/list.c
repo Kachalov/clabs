@@ -5,7 +5,7 @@
 #include "debug.h"
 #include "errors.h"
 
-int list_init(node_t **head)
+int node_init(node_t **head)
 {
     int err = EOK;
     *head = malloc(sizeof(node_t));
@@ -21,7 +21,7 @@ int list_init(node_t **head)
     return err;
 }
 
-void list_free(node_t **head)
+void node_free(node_t **head)
 {
     while (pop_front(head));
 }
@@ -64,6 +64,18 @@ void insert(node_t **head, node_t *elem, node_t *before)
     {
         *head = elem;
     }
+}
+
+int insert_data(node_t **head, void *data)
+{
+    int err = EOK;
+    node_t *el = NULL;
+
+    err = node_init(&el);
+    el->data = data;
+    insert(head, el, NULL);
+
+    return err;
 }
 
 node_t *reverse(node_t *head)
