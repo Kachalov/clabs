@@ -71,9 +71,9 @@ int main(void)
                     found = 1;
                 }
 
-            prev = cur;
             if (!found)
             {
+                prev = cur;
                 cur = cur->next;
             }
         }
