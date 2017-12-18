@@ -30,8 +30,9 @@ int main(void)
     TEST_SNPRINTF(err, buf10, 10, "%c--%%c--%c", 'a', 'f');
     TEST_SNPRINTF(err, buf20, 20, "%s/%c", "%abe", '!');
     TEST_SNPRINTF(err, buf20, 20, "[%ls]", L"lorem");
+    TEST_SNPRINTF(err, buf10, 10, "%c--%s--%s-%s", '\0', "","\0",(char *)0);
+
 
     printf("\nErrors: %u\n", err);
     return err != 0;
 }
-

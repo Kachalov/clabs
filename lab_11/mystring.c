@@ -5,17 +5,15 @@
 #include "mystring.h"
 
 #define SAFE_WRITE(b, n, s, c) do {\
-if (0 <= b && b < n) *s++ = c;\
-b++;\
+if (0 <= (b) && (b) < (n)) *(s)++ = (c);\
+(b)++;\
 } while (0)
 
 int my_strcmp(const char *str1, const char *str2)
 {
     const char *i = str1;
     const char *j = str2;
-    for (; i && j; i++, j++)
-        if (*i != *j)
-            break;
+    for (; i && j && *i == *j; i++, j++);
 
     return *i - *j;
 }
@@ -28,11 +26,8 @@ int my_snprintf(char *s, size_t n, const char *format, ...)
     int bytes = 0;
 
     va_start(va, format);
-    for (const char *i = format; *i; i++)
+    for (const char *i = format; *i && bytes >= 0; i++)
     {
-        if (bytes < 0)
-            break;
-
         if (fmt && *i != '%')
         {
             switch (*i)
