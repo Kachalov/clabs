@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <dlfcn.h>
 
-#include "array.h"
 #include "errors.h"
 
 int main(int argc, char *argv[]) {
@@ -10,6 +10,9 @@ int main(int argc, char *argv[]) {
 
     FILE *fin = NULL;
     FILE *fout = NULL;
+
+    void *libarr;
+    int (*process)(FILE *, FILE *, int);
 
     char **cur_arg = argv + 1;
     bool filtering = false;
@@ -41,8 +44,24 @@ int main(int argc, char *argv[]) {
             }
             else
             {
-                err = process(fin, fout, filtering);
-                fclose(fout);
+                if (!(libarr = dlopen("./libarr.so", RTLD_LAZY)))
+                {
+                    printf("DL error: %s\n", dlerror());
+                    err = DL_ERROR;
+                }
+                else if (!(process = dlsym(libarr, "process")))
+                {
+                    printf("DL error: %s\n", dlerror());
+                    err = DL_ERROR;
+                }
+                else
+                {
+                    err = process(fin, fout, filtering);
+                    fclose(fout);
+                }
+
+                if (libarr)
+                    dlclose(libarr);
             }
             fclose(fin);
         }

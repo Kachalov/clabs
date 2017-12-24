@@ -24,6 +24,9 @@ char *error_msg(int err)
         case MEM_ALLOC_ERR:
             msg = "Memory allocate error";
             break;
+        case DL_ERROR:
+            msg = "DL error";
+            break;
         default:
             sprintf(msg, "Unknown code #%d", err);
             break;

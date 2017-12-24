@@ -1,8 +1,8 @@
 CC := gcc
 
-CFLAGS := -Wall -Werror -std=c99 -g -fno-inline -fno-omit-frame-pointer
+CFLAGS := -Wall -Werror -std=c99 -fPIC -g -fno-inline -fno-omit-frame-pointer
 
-OBJS := filter.o sort.o array.o swap.o errors.o
+OBJS := array.o filter.o sort.o swap.o errors.o time.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -fprofile-arcs -ftest-coverage
@@ -12,8 +12,21 @@ ifeq ($(mode), release)
 	CFLAGS += -DNDEBUG
 endif
 
-main.exe: $(OBJS) main.o
-	$(CC) $(CFLAGS) $^ -o $@
+libarr.a: $(OBJS)
+	ar rc $@ $^
+	ranlib $@
+
+libarr.so: $(OBJS)
+	gcc -shared -fPIC -o $@ $^
+
+main.exe: libarr.a
+	$(CC) $(CFLAGS) main.c $^ -o $@
+
+so_main.exe: libarr.so
+	$(CC) $(CFLAGS) main.c $^ -o $@
+
+dso_main.exe: errors.o
+	$(CC) $(CFLAGS) dso_main.c $^ -ldl -o $@
 
 test.exe: $(OBJS) test.o test_filter.o test_sort.o
 	$(CC) $(CFLAGS) $^ -o $@
