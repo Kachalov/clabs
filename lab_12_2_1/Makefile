@@ -2,7 +2,7 @@ CC := gcc
 
 CFLAGS := -Wall -Werror -std=c99 -fPIC -g
 
-OBJS := array.o
+OBJS := array.o errors.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0

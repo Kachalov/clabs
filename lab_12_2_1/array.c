@@ -39,25 +39,29 @@ void offset_array(size_t k, size_t num, size_t size, void *data)
 
 int is_pow(size_t num)
 {
-    for (size_t i = 0; i < num; i++)
+    for (size_t i = 0; i <= num; i++)
         if (i * i == num)
             return 1;
     return 0;
 }
 
-void copy_int_array(size_t num, void *f, int *t_num, void **t)
+int copy_int_array(size_t num, void *f, int *t_num, void **t)
 {
     size_t c = 0;
+    int err = OK;
 
     for (int i = 0; i < num; i++)
         if (is_pow(((int *)f)[i]))
             (*t_num)++;
 
-    create_array(*t_num, sizeof(int), t);
+    err = create_array(*t_num, sizeof(int), t);
 
-    for (int i = 0; i < num; i++)
-        if (is_pow(((int *)f)[i]))
-            (*(int **)t)[c++] = ((int *)f)[i];
+    if (!err)
+        for (int i = 0; i < num; i++)
+            if (is_pow(((int *)f)[i]))
+                (*(int **)t)[c++] = ((int *)f)[i];
+
+    return err;
 }
 
 void print_int_array(size_t num, void *data)
