@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "test.h"
 #include "test_filter.h"
 #include "test_sort.h"
 #include "errors.h"
