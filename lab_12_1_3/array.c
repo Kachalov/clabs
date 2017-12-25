@@ -31,6 +31,7 @@ int process(FILE *fin, FILE *fout, int filtering)
             if (filtering)
             {
                 err = filter(data_b, data_e, &data_f_b, &data_f_e);
+                data_f_len = (data_f_e - data_f_b) / data_size;
             }
             else
             {
