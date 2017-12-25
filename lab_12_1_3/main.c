@@ -5,7 +5,8 @@
 #include "array.h"
 #include "errors.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     int err = OK;
 
     FILE *fin = NULL;
